@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#15191A">
+<title>Scheme Keeper — Archenemy Tracker</title>
+<style>
+  :root{
+    --ink:#15191A;
+    --ink-deep:#0D0F10;
+    --parchment:#E6D9B8;
+    --parchment-hi:#F2E8CB;
+    --brass:#A9803E;
+    --brass-bright:#D8AE66;
+    --ember:#9C4630;
+    --text-dark:#2B2416;
+    --text-light:#E9E2CC;
+    --muted:#7C8A79;
+    --panel-border:rgba(169,128,62,0.35);
+    --font-display:Georgia,'Iowan Old Style','Palatino Linotype',serif;
+    --font-body:Georgia,'Iowan Old Style',serif;
+    --font-ui:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    min-height:100vh;
+    background: radial-gradient(ellipse at top, #1c211f 0%, var(--ink) 55%, var(--ink-deep) 100%);
+    color:var(--text-light);
+    font-family:var(--font-ui);
+    -webkit-font-smoothing:antialiased;
+  }
+  #app{max-width:480px;margin:0 auto;min-height:100vh;padding:20px 16px 110px;position:relative;}
+  button{font-family:inherit;cursor:pointer;}
+  input,textarea{font-family:inherit;}
+
+  /* header */
+  .topbar{display:flex;align-items:center;gap:12px;margin-bottom:20px;}
+  .seal-mini{width:38px;height:38px;flex-shrink:0;}
+  .app-title{font-family:var(--font-display);font-size:19px;letter-spacing:0.07em;text-transform:uppercase;color:var(--brass-bright);}
+  .app-subtitle{font-size:11px;color:var(--muted);letter-spacing:0.03em;margin-top:2px;}
+
+  /* turn panel */
+  .turn-panel{text-align:center;background:linear-gradient(180deg,rgba(169,128,62,0.08),transparent);border:1px solid var(--panel-border);border-radius:14px;padding:22px 16px;margin-bottom:16px;}
+  .turn-label{font-size:11px;text-transform:uppercase;letter-spacing:0.15em;color:var(--muted);margin-bottom:2px;}
+  .turn-number{font-family:var(--font-display);font-size:54px;line-height:1;color:var(--parchment-hi);text-shadow:0 0 24px rgba(216,174,102,0.22);}
+  .turn-controls{display:flex;gap:10px;justify-content:center;margin-top:14px;}
+  .btn{padding:10px 16px;border-radius:9px;border:1px solid var(--panel-border);background:rgba(255,255,255,0.03);color:var(--text-light);font-size:14px;}
+  .btn-primary{background:linear-gradient(180deg,var(--brass-bright),var(--brass));color:var(--ink-deep);border:none;font-weight:600;}
+  .btn-ghost{background:none;border:1px solid var(--panel-border);color:var(--text-light);}
+  .btn-danger{background:none;border:1px solid var(--ember);color:#e0a08f;}
+  .btn-block{display:block;width:100%;}
+  .eligibility{margin-top:14px;font-size:13px;}
+  .eligibility.lit{color:var(--brass-bright);}
+  .eligibility.lit::before{content:'●';margin-right:6px;text-shadow:0 0 8px var(--brass-bright);}
+  .eligibility.unlit{color:var(--muted);}
+  .eligibility.unlit::before{content:'○';margin-right:6px;}
+
+  /* draw button + helper */
+  .draw-btn{display:block;width:100%;padding:16px;font-size:16px;font-weight:600;letter-spacing:0.02em;background:linear-gradient(180deg,var(--brass-bright),var(--brass));color:var(--ink-deep);border:none;border-radius:12px;margin-bottom:6px;}
+  .draw-btn:disabled{background:#2c2e29;color:var(--muted);}
+  .draw-hint{font-size:12px;color:var(--muted);text-align:center;margin-bottom:14px;min-height:14px;}
+
+  /* scheme reveal card */
+  .scheme-card{background:var(--parchment);color:var(--text-dark);border-radius:10px;overflow:hidden;box-shadow:0 14px 32px rgba(0,0,0,0.42);position:relative;border:1px solid rgba(43,36,22,0.25);aspect-ratio:1.45/1;display:flex;flex-direction:column;margin:14px 0 10px;}
+  .scheme-card-name{font-family:var(--font-display);font-size:16px;padding:8px 12px 6px;background:linear-gradient(180deg,var(--parchment-hi),var(--parchment));flex:0 0 auto;}
+  .scheme-card-art-wrap{flex:0 0 42%;overflow:hidden;}
+  .scheme-card-art{width:100%;height:100%;}
+  .scheme-card-art svg,.scheme-card-art img{width:100%;height:100%;object-fit:cover;display:block;}
+  .scheme-card-type{font-size:10px;text-transform:uppercase;letter-spacing:0.1em;color:var(--ember);font-weight:700;padding:5px 12px;background:var(--parchment);border-top:1px solid rgba(43,36,22,0.15);border-bottom:1px solid rgba(43,36,22,0.15);flex:0 0 auto;}
+  .scheme-card-text{flex:1;padding:8px 12px 10px;overflow-y:auto;font-family:var(--font-body);font-size:13px;line-height:1.45;background:var(--parchment);white-space:pre-wrap;}
+  .scheme-card-actions-row{margin:0 0 20px;}
+  .scheme-card.reveal{animation:unfurl .55s cubic-bezier(.2,.7,.3,1) both;transform-origin:top center;}
+  @keyframes unfurl{0%{transform:scaleY(.08);opacity:0}55%{transform:scaleY(1.04);opacity:1}100%{transform:scaleY(1);opacity:1}}
+  @media (prefers-reduced-motion:reduce){.scheme-card.reveal{animation:none;}}
+  .art-thumb{width:34px;height:24px;border-radius:4px;overflow:hidden;flex-shrink:0;border:1px solid var(--panel-border);}
+  .art-thumb svg,.art-thumb img{width:100%;height:100%;object-fit:cover;display:block;}
+  .art-box-form{width:100%;aspect-ratio:2/1;border-radius:8px;overflow:hidden;border:1px solid var(--panel-border);margin-top:6px;}
+  .art-box-form svg,.art-box-form img{width:100%;height:100%;object-fit:cover;display:block;}
+  .art-upload-actions{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;}
+  .file-btn{display:inline-flex;align-items:center;justify-content:center;}
+  .ongoing-item-main{display:flex;align-items:center;gap:8px;min-width:0;}
+
+  /* ongoing + history */
+  .section-label{font-size:11px;text-transform:uppercase;letter-spacing:0.13em;color:var(--muted);margin:18px 0 8px;}
+  .ongoing-item{display:flex;justify-content:space-between;align-items:center;background:rgba(255,255,255,0.03);border:1px solid var(--panel-border);border-radius:9px;padding:10px 12px;margin-bottom:8px;font-size:14px;}
+  details.history{margin-top:8px;}
+  details.history summary{cursor:pointer;font-size:12px;color:var(--muted);letter-spacing:0.05em;list-style:none;}
+  details.history summary::-webkit-details-marker{display:none;}
+  details.history summary::before{content:'▸ ';}
+  details.history[open] summary::before{content:'▾ ';}
+  .history-item{font-size:13px;color:var(--text-light);opacity:0.85;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.06);}
+  .deck-footer{font-size:12px;color:var(--muted);text-align:center;margin-top:18px;}
+  .empty-note{font-size:13px;color:var(--muted);text-align:center;padding:24px 8px;line-height:1.6;}
+
+  /* cards tab */
+  .cards-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;gap:10px;}
+  .cards-header-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;}
+  #bulk-text{width:100%;min-height:320px;background:rgba(0,0,0,0.25);border:1px solid var(--panel-border);border-radius:8px;color:var(--text-light);padding:12px;font-size:14px;line-height:1.5;margin-top:10px;}
+  .bulk-actions{display:flex;gap:8px;margin-top:10px;}
+  .bulk-actions button{flex:1;}
+  .cards-count{font-size:12px;color:var(--muted);}
+  .card-row{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,0.03);border:1px solid var(--panel-border);border-radius:10px;padding:12px 14px;margin-bottom:8px;}
+  .card-row-main{display:flex;flex-direction:column;gap:4px;min-width:0;flex:1;}
+  .card-row-name{font-family:var(--font-display);font-size:15px;color:var(--parchment-hi);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .badge{font-size:10px;text-transform:uppercase;letter-spacing:0.08em;padding:2px 7px;border-radius:20px;width:fit-content;}
+  .badge.oneshot{background:rgba(216,174,102,0.15);color:var(--brass-bright);}
+  .badge.ongoing{background:rgba(156,70,48,0.2);color:#e0a08f;}
+  .card-row-qty{font-size:13px;color:var(--muted);flex-shrink:0;}
+
+  /* forms */
+  .form-panel{background:rgba(255,255,255,0.03);border:1px solid var(--panel-border);border-radius:12px;padding:16px;margin-bottom:18px;}
+  .form-panel label{display:block;font-size:12px;color:var(--muted);margin-bottom:5px;margin-top:12px;}
+  .form-panel label:first-child{margin-top:0;}
+  .form-panel input[type=text],.form-panel input[type=number],.form-panel textarea{
+    width:100%;background:rgba(0,0,0,0.25);border:1px solid var(--panel-border);border-radius:8px;color:var(--text-light);padding:10px 11px;font-size:15px;
+  }
+  .form-panel textarea{min-height:80px;resize:vertical;font-family:var(--font-body);}
+  .type-toggle{display:flex;gap:8px;margin-top:6px;}
+  .type-toggle button{flex:1;padding:9px 0;border-radius:8px;border:1px solid var(--panel-border);background:none;color:var(--muted);font-size:13px;}
+  .type-toggle button.active{background:rgba(216,174,102,0.15);color:var(--brass-bright);border-color:var(--brass);}
+  .form-actions{display:flex;gap:8px;margin-top:16px;}
+  .form-actions button{flex:1;}
+
+  /* rules tab */
+  .rules-section{background:rgba(255,255,255,0.03);border:1px solid var(--panel-border);border-radius:12px;padding:16px;margin-bottom:16px;}
+  .rules-row{display:flex;gap:10px;align-items:center;margin-top:10px;}
+  .rules-row label{font-size:13px;color:var(--text-light);flex:1;}
+  .rules-row input{width:70px;background:rgba(0,0,0,0.25);border:1px solid var(--panel-border);border-radius:8px;color:var(--text-light);padding:8px;font-size:15px;text-align:center;}
+  .hint{font-size:12px;color:var(--muted);line-height:1.5;margin-top:10px;}
+  .rules-section .btn{margin-top:10px;margin-right:8px;}
+  #backup-out,#backup-in{width:100%;min-height:90px;background:rgba(0,0,0,0.25);border:1px solid var(--panel-border);border-radius:8px;color:var(--text-light);padding:10px;font-size:12px;font-family:monospace;margin-top:10px;}
+
+  /* tab bar */
+  .tabbar{position:fixed;bottom:0;left:0;right:0;display:flex;background:var(--ink-deep);border-top:1px solid var(--panel-border);padding-bottom:env(safe-area-inset-bottom);z-index:10;}
+  .tabbar button{flex:1;padding:14px 0 12px;background:none;border:none;color:var(--muted);font-size:12px;letter-spacing:0.04em;}
+  .tabbar button.active{color:var(--brass-bright);}
+  .loading{text-align:center;padding:60px 20px;color:var(--muted);font-size:14px;}
+</style>
+</head>
+<body>
+<div id="app"><div class="loading">Unrolling the scroll…</div></div>
+<script>
+(function(){
+  "use strict";
+
+  var LIB_KEY = 'scheme-library';
+  var GAME_KEY = 'scheme-game';
+
+  var library = null;
+  var game = null;
+  var activeTab = 'table';
+  var cardForm = null;
+  var pendingDeleteId = null;
+  var pendingNewGame = false;
+  var showBackup = false;
+  var bulkMode = false;
+  var justDrawnAnimation = false;
+  var storageError = false;
+  var STORAGE_MODE = 'local';
+  try {
+    if (typeof window.storage !== 'undefined' && window.storage && typeof window.storage.get === 'function'){
+      STORAGE_MODE = 'claude';
+    }
+  } catch (e) { STORAGE_MODE = 'local'; }
+
+  function withTimeout(promiseFactory, ms){
+    return new Promise(function(resolve){
+      var done = false;
+      var timer = setTimeout(function(){ if (!done){ done = true; resolve({ __timedOut: true }); } }, ms);
+      Promise.resolve().then(promiseFactory).then(function(v){
+        if (!done){ done = true; clearTimeout(timer); resolve(v); }
+      }, function(){
+        if (!done){ done = true; clearTimeout(timer); resolve({ __timedOut: true }); }
+      });
+    });
+  }
+
+  async function storageGet(key){
+    if (STORAGE_MODE === 'claude'){
+      var result = await withTimeout(function(){ return window.storage.get(key); }, 2200);
+      if (!result || result.__timedOut){ STORAGE_MODE = 'local'; }
+      else { return result; }
+    }
+    try {
+      var raw = localStorage.getItem(key);
+      return raw ? { key: key, value: raw } : null;
+    } catch (e) { return null; }
+  }
+  async function storageSet(key, value){
+    if (STORAGE_MODE === 'claude'){
+      var result = await withTimeout(function(){ return window.storage.set(key, value); }, 2200);
+      if (!result || result.__timedOut){ STORAGE_MODE = 'local'; }
+      else { return result; }
+    }
+    try { localStorage.setItem(key, value); return { key: key, value: value }; }
+    catch (e) { return null; }
+  }
+
+  function uid(){ return Math.random().toString(36).slice(2,10) + Date.now().toString(36).slice(-4); }
+
+  function esc(str){
+    return String(str == null ? '' : str).replace(/[&<>"']/g, function(s){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[s];
+    });
+  }
+
+  function defaultLibrary(){
+    return {
+      cards: [
+        { id: uid(), name: 'The Watcher Stirs', text: 'Example one-shot scheme. Tap this card to edit its name and effect text, or add your own below.', type: 'oneshot', qty: 1, art: null },
+        { id: uid(), name: 'A Shadow Lingers', text: 'Example ongoing scheme. Ongoing schemes stay face up until you abandon them from the Table tab.', type: 'ongoing', qty: 1, art: null }
+      ],
+      rules: { startTurn: 1, interval: 1 }
+    };
+  }
+  function defaultGame(){
+    return { turn: 0, deck: [], ongoing: [], drawnThisTurn: false, lastDrawn: null, history: [] };
+  }
+
+  function shuffle(arr){
+    var a = arr.slice();
+    for (var i = a.length - 1; i > 0; i--){
+      var j = Math.floor(Math.random() * (i + 1));
+      var tmp = a[i]; a[i] = a[j]; a[j] = tmp;
+    }
+    return a;
+  }
+
+  var SEED_CARDS = [
+    {
+      seedId: 'seed-watcher-awakens-v1',
+      name: 'The Watcher Awakens',
+      text: 'When you set this scheme in motion, destroy up to two target creatures. For each creature that died this way, its controller creates a Food token.\n(Food is an artifact token with "{2}, {T}, Sacrifice this artifact: You gain 3 life.")',
+      type: 'oneshot',
+      qty: 1,
+      art: '<svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="wg1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0d1512"/><stop offset="100%" stop-color="#1f2f24"/></linearGradient><linearGradient id="tg1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#42513c"/><stop offset="100%" stop-color="#212b1e"/></linearGradient></defs><rect width="400" height="200" fill="url(#wg1)"/><path d="M0,158 Q50,148 100,158 T200,158 T300,158 T400,158" stroke="#4a5d4f" stroke-width="2" fill="none" opacity="0.4"/><path d="M0,172 Q50,164 100,172 T200,172 T300,172 T400,172" stroke="#3a4a3f" stroke-width="2" fill="none" opacity="0.3"/><path d="M55,200 C48,150 82,110 66,55 C61,38 78,28 88,34 C80,72 96,116 112,150 C122,172 100,192 55,200 Z" fill="url(#tg1)" stroke="#A9803E" stroke-width="1"/><path d="M300,200 C292,152 328,118 308,64 C302,48 322,42 328,58 C316,94 332,138 344,172 C350,190 326,198 300,200 Z" fill="url(#tg1)" stroke="#A9803E" stroke-width="1" opacity="0.92"/><path d="M175,200 C188,158 162,120 186,80 C196,64 214,70 208,84 C192,112 204,150 214,182 C218,195 198,200 175,200 Z" fill="url(#tg1)" stroke="#A9803E" stroke-width="0.9" opacity="0.88"/><path d="M232,200 C244,175 236,150 258,132 C268,124 280,132 273,141 C258,157 262,180 250,200 Z" fill="url(#tg1)" stroke="#A9803E" stroke-width="0.8" opacity="0.8"/><circle cx="140" cy="118" r="3" fill="#D8AE66" opacity="0.4"/><circle cx="262" cy="92" r="2.2" fill="#D8AE66" opacity="0.35"/><circle cx="330" cy="128" r="2.6" fill="#D8AE66" opacity="0.3"/></svg>'
+    }
+  ];
+
+  async function loadAll(){
+    var libRes = null, gameRes = null;
+    try {
+      var results = await Promise.all([storageGet(LIB_KEY), storageGet(GAME_KEY)]);
+      libRes = results[0]; gameRes = results[1];
+    } catch (e) { /* leave both null, defaults kick in below */ }
+
+    try { library = libRes ? JSON.parse(libRes.value) : defaultLibrary(); }
+    catch (e) { library = defaultLibrary(); }
+    if (!library || typeof library !== 'object' || !Array.isArray(library.cards)) library = defaultLibrary();
+
+    try { game = gameRes ? JSON.parse(gameRes.value) : defaultGame(); }
+    catch (e) { game = defaultGame(); }
+    if (!game || typeof game !== 'object' || !Array.isArray(game.deck) || !Array.isArray(game.ongoing) || !Array.isArray(game.history)) game = defaultGame();
+
+    if (!library.seededIds) library.seededIds = [];
+    var seededChanged = false;
+    SEED_CARDS.forEach(function(seed){
+      if (library.seededIds.indexOf(seed.seedId) === -1){
+        library.cards.push({ id: uid(), name: seed.name, text: seed.text, type: seed.type, qty: seed.qty, art: seed.art || null });
+        library.seededIds.push(seed.seedId);
+        seededChanged = true;
+      }
+    });
+    if (seededChanged) saveLibrary();
+
+    var ids = {};
+    library.cards.forEach(function(c){ ids[c.id] = true; });
+    game.deck = (game.deck || []).filter(function(i){ return ids[i.cardId]; });
+    game.ongoing = (game.ongoing || []).filter(function(i){ return ids[i.cardId]; });
+
+    if (game.deck.length === 0 && game.ongoing.length === 0 && library.cards.length > 0){
+      rebuildDeck(false, false);
+    }
+    render();
+  }
+
+  async function saveLibrary(){
+    try {
+      var ok = await storageSet(LIB_KEY, JSON.stringify(library));
+      storageError = !ok;
+    } catch (e) { storageError = true; console.error('Scheme Keeper: save library failed', e); }
+  }
+  async function saveGame(){
+    try {
+      var ok = await storageSet(GAME_KEY, JSON.stringify(game));
+      storageError = !ok;
+    } catch (e) { storageError = true; console.error('Scheme Keeper: save game failed', e); }
+  }
+
+  function rebuildDeck(resetTurn, doRender){
+    var instances = [];
+    library.cards.forEach(function(c){
+      var qty = Math.max(1, c.qty || 1);
+      for (var i = 0; i < qty; i++){ instances.push({ id: uid(), cardId: c.id }); }
+    });
+    game.deck = shuffle(instances);
+    game.ongoing = [];
+    game.drawnThisTurn = false;
+    game.lastDrawn = null;
+    game.history = [];
+    if (resetTurn) game.turn = 0;
+    saveGame();
+    if (doRender !== false) render();
+  }
+
+  function isEligible(){
+    var startTurn = library.rules.startTurn, interval = Math.max(1, library.rules.interval || 1);
+    return game.turn >= startTurn && (game.turn - startTurn) % interval === 0;
+  }
+  function nextEligibleTurn(){
+    var startTurn = library.rules.startTurn, interval = Math.max(1, library.rules.interval || 1);
+    if (game.turn < startTurn) return startTurn;
+    var rem = (game.turn - startTurn) % interval;
+    return rem === 0 ? game.turn : game.turn + (interval - rem);
+  }
+
+  function nextTurn(){ game.turn += 1; game.drawnThisTurn = false; saveGame(); render(); }
+  function prevTurn(){ if (game.turn > 0){ game.turn -= 1; game.drawnThisTurn = false; saveGame(); render(); } }
+
+  function drawScheme(){
+    if (game.drawnThisTurn || !isEligible() || game.deck.length === 0) return;
+    var drawn = game.deck.shift();
+    var card = null;
+    for (var i = 0; i < library.cards.length; i++){ if (library.cards[i].id === drawn.cardId){ card = library.cards[i]; break; } }
+    if (!card){ saveGame(); render(); return; }
+    game.drawnThisTurn = true;
+    game.lastDrawn = { instanceId: drawn.id, cardId: card.id, name: card.name, text: card.text, type: card.type, art: card.art || null };
+    game.history.unshift({ turn: game.turn, name: card.name, type: card.type });
+    if (card.type === 'ongoing'){ game.ongoing.push(drawn); }
+    else { game.deck.push(drawn); }
+    justDrawnAnimation = true;
+    saveGame();
+    render();
+  }
+
+  function dismissLastDrawn(){ game.lastDrawn = null; saveGame(); render(); }
+
+  function abandonOngoing(instanceId){
+    var idx = -1;
+    for (var i = 0; i < game.ongoing.length; i++){ if (game.ongoing[i].id === instanceId){ idx = i; break; } }
+    if (idx < 0) return;
+    var item = game.ongoing.splice(idx, 1)[0];
+    game.deck.push(item);
+    saveGame();
+    render();
+  }
+
+  function switchTab(tab){
+    activeTab = tab;
+    cardForm = null;
+    pendingDeleteId = null;
+    pendingNewGame = false;
+    showBackup = false;
+    bulkMode = false;
+    render();
+  }
+
+  function openCardForm(id){
+    if (id){
+      var found = null;
+      for (var i = 0; i < library.cards.length; i++){ if (library.cards[i].id === id){ found = library.cards[i]; break; } }
+      if (!found) return;
+      cardForm = { id: found.id, name: found.name, text: found.text, type: found.type, qty: found.qty, art: found.art || null };
+    } else {
+      cardForm = { id: null, name: '', text: '', type: 'oneshot', qty: 1, art: null };
+    }
+    pendingDeleteId = null;
+    render();
+  }
+  function closeCardForm(){ cardForm = null; pendingDeleteId = null; render(); }
+
+  function syncFormFromDOM(){
+    if (!cardForm) return;
+    var n = document.getElementById('cf-name');
+    var t = document.getElementById('cf-text');
+    var q = document.getElementById('cf-qty');
+    if (n) cardForm.name = n.value;
+    if (t) cardForm.text = t.value;
+    if (q) cardForm.qty = Math.max(1, parseInt(q.value, 10) || 1);
+  }
+  function setFormType(type){ syncFormFromDOM(); cardForm.type = type; render(); }
+
+  function saveCardForm(){
+    syncFormFromDOM();
+    var name = (cardForm.name || '').trim();
+    if (!name){ return; }
+    if (cardForm.id){
+      for (var i = 0; i < library.cards.length; i++){
+        if (library.cards[i].id === cardForm.id){
+          library.cards[i].name = name;
+          library.cards[i].text = cardForm.text || '';
+          library.cards[i].type = cardForm.type;
+          library.cards[i].qty = cardForm.qty;
+          library.cards[i].art = cardForm.art || null;
+          break;
+        }
+      }
+    } else {
+      library.cards.push({ id: uid(), name: name, text: cardForm.text || '', type: cardForm.type, qty: cardForm.qty, art: cardForm.art || null });
+    }
+    saveLibrary();
+    cardForm = null;
+    render();
+  }
+
+  function deleteCardConfirm(id){
+    if (pendingDeleteId === id){
+      library.cards = library.cards.filter(function(c){ return c.id !== id; });
+      game.deck = game.deck.filter(function(i){ return i.cardId !== id; });
+      game.ongoing = game.ongoing.filter(function(i){ return i.cardId !== id; });
+      saveLibrary(); saveGame();
+      pendingDeleteId = null;
+      cardForm = null;
+      render();
+    } else {
+      pendingDeleteId = id;
+      render();
+    }
+  }
+
+  function toggleBulk(){
+    bulkMode = !bulkMode;
+    cardForm = null;
+    pendingDeleteId = null;
+    render();
+  }
+
+  function exportCardsAsText(){
+    return library.cards.map(function(c){
+      return 'Name: ' + c.name + '\nType: ' + (c.type === 'ongoing' ? 'ongoing' : 'oneshot') + '\nQty: ' + (c.qty || 1) + '\nText: ' + (c.text || '');
+    }).join('\n---\n');
+  }
+
+  function parseCardsText(text){
+    var lines = text.replace(/\r\n/g, '\n').split('\n');
+    var blocks = [[]];
+    lines.forEach(function(line){
+      if (/^-{3,}\s*$/.test(line.trim())){ blocks.push([]); }
+      else { blocks[blocks.length - 1].push(line); }
+    });
+    var cards = [];
+    blocks.forEach(function(blockLines){
+      var name = '', type = 'oneshot', qty = 1, textLines = null;
+      for (var i = 0; i < blockLines.length; i++){
+        var line = blockLines[i];
+        if (textLines !== null){ textLines.push(line); continue; }
+        var mName = /^\s*Name\s*:\s*(.*)$/i.exec(line);
+        var mType = /^\s*Type\s*:\s*(.*)$/i.exec(line);
+        var mQty = /^\s*Qty\s*:\s*(.*)$/i.exec(line);
+        var mText = /^\s*Text\s*:\s*(.*)$/i.exec(line);
+        if (mName){ name = mName[1].trim(); }
+        else if (mType){ type = /ongoing/i.test(mType[1]) ? 'ongoing' : 'oneshot'; }
+        else if (mQty){ qty = Math.max(1, parseInt(mQty[1], 10) || 1); }
+        else if (mText){ textLines = [mText[1]]; }
+      }
+      var cardText = textLines ? textLines.join('\n').trim() : '';
+      name = name.trim();
+      if (name){ cards.push({ name: name, type: type, qty: qty, text: cardText }); }
+    });
+    return cards;
+  }
+
+  function saveBulkCards(){
+    var el = document.getElementById('bulk-text');
+    if (!el) return;
+    var parsed = parseCardsText(el.value);
+    if (parsed.length === 0){
+      alert('No cards found. Make sure each card has a Name: line, with cards separated by a line of ---.');
+      return;
+    }
+    var existingByName = {};
+    library.cards.forEach(function(c){ existingByName[(c.name || '').trim().toLowerCase()] = c; });
+    library.cards = parsed.map(function(p){
+      var match = existingByName[p.name.toLowerCase()];
+      return { id: match ? match.id : uid(), name: p.name, type: p.type, qty: p.qty, text: p.text, art: match ? (match.art || null) : null };
+    });
+    var ids = {};
+    library.cards.forEach(function(c){ ids[c.id] = true; });
+    game.deck = game.deck.filter(function(i){ return ids[i.cardId]; });
+    game.ongoing = game.ongoing.filter(function(i){ return ids[i.cardId]; });
+    saveLibrary(); saveGame();
+    bulkMode = false;
+    render();
+  }
+
+  function saveRules(){
+    var s = document.getElementById('rule-start');
+    var iv = document.getElementById('rule-interval');
+    var startTurn = Math.max(0, parseInt(s.value, 10) || 0);
+    var interval = Math.max(1, parseInt(iv.value, 10) || 1);
+    library.rules = { startTurn: startTurn, interval: interval };
+    saveLibrary();
+    render();
+  }
+
+  function confirmNewGame(){
+    if (pendingNewGame){ rebuildDeck(true, false); pendingNewGame = false; render(); }
+    else { pendingNewGame = true; render(); }
+  }
+  function reshuffleNow(){ rebuildDeck(false, false); render(); }
+
+  function toggleBackup(){ showBackup = !showBackup; render(); }
+  function copyBackup(){
+    var el = document.getElementById('backup-out');
+    if (el){ el.select(); el.setSelectionRange(0, 99999); try { document.execCommand('copy'); } catch(e){} }
+  }
+  function doImport(){
+    var el = document.getElementById('backup-in');
+    if (!el || !el.value.trim()) return;
+    try {
+      var parsed = JSON.parse(el.value);
+      if (parsed.library) library = parsed.library;
+      if (parsed.game) game = parsed.game;
+      saveLibrary(); saveGame();
+      showBackup = false;
+      render();
+    } catch (e) {
+      alert('That backup code could not be read. Double check it was copied in full.');
+    }
+  }
+
+  function sealMarkup(){
+    return '<circle cx="50" cy="50" r="46" fill="none" stroke="#A9803E" stroke-width="2.5"/>' +
+      '<circle cx="50" cy="50" r="34" fill="none" stroke="#D8AE66" stroke-width="1.5"/>' +
+      '<circle cx="50" cy="50" r="6" fill="#D8AE66"/>' +
+      '<g stroke="#A9803E" stroke-width="2" stroke-linecap="round">' +
+      '<line x1="50" y1="16" x2="50" y2="4"/><line x1="50" y1="84" x2="50" y2="96"/>' +
+      '<line x1="16" y1="50" x2="4" y2="50"/><line x1="84" y1="50" x2="96" y2="50"/>' +
+      '<line x1="27" y1="27" x2="19" y2="19"/><line x1="73" y1="73" x2="81" y2="81"/>' +
+      '<line x1="73" y1="27" x2="81" y2="19"/><line x1="27" y1="73" x2="19" y2="81"/>' +
+      '</g>';
+  }
+  function sealSVG(size){
+    return '<svg viewBox="0 0 100 100" width="' + size + '" height="' + size + '" xmlns="http://www.w3.org/2000/svg">' + sealMarkup() + '</svg>';
+  }
+  function defaultArtSVG(){
+    return '<svg viewBox="0 0 400 200" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">' +
+      '<rect width="400" height="200" fill="#1c211f"/>' +
+      '<g opacity="0.45" stroke="#A9803E" stroke-width="1">' +
+      '<line x1="0" y1="50" x2="400" y2="50"/><line x1="0" y1="100" x2="400" y2="100"/><line x1="0" y1="150" x2="400" y2="150"/>' +
+      '</g>' +
+      '<g transform="translate(140,40) scale(0.6)" opacity="0.55">' + sealMarkup() + '</g>' +
+      '</svg>';
+  }
+  function renderArtBox(art, context){
+    var cls = context === 'form' ? 'art-box-form' : context === 'thumb' ? 'art-thumb' : 'scheme-card-art';
+    if (!art){ return '<div class="' + cls + '">' + defaultArtSVG() + '</div>'; }
+    if (art.indexOf('<svg') === 0){ return '<div class="' + cls + '">' + art + '</div>'; }
+    return '<div class="' + cls + '"><img src="' + art + '" alt=""></div>';
+  }
+  function downscaleImage(dataUrl, maxWidth, quality){
+    return new Promise(function(resolve){
+      var img = new Image();
+      img.onload = function(){
+        var scale = Math.min(1, maxWidth / img.width);
+        var w = Math.max(1, Math.round(img.width * scale));
+        var h = Math.max(1, Math.round(img.height * scale));
+        var canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        var ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, w, h);
+        try { resolve(canvas.toDataURL('image/jpeg', quality)); }
+        catch (e) { resolve(dataUrl); }
+      };
+      img.onerror = function(){ resolve(dataUrl); };
+      img.src = dataUrl;
+    });
+  }
+  function onArtFileSelected(input){
+    var file = input.files && input.files[0];
+    if (!file || !cardForm) return;
+    var reader = new FileReader();
+    reader.onload = function(){
+      syncFormFromDOM();
+      downscaleImage(reader.result, 520, 0.82).then(function(small){
+        cardForm.art = small;
+        render();
+      });
+    };
+    reader.readAsDataURL(file);
+  }
+  function removeArt(){ if (!cardForm) return; syncFormFromDOM(); cardForm.art = null; render(); }
+
+  function renderHeader(){
+    return '<div class="topbar">' +
+      '<div class="seal-mini">' + sealSVG(38) + '</div>' +
+      '<div><div class="app-title">Scheme Keeper</div><div class="app-subtitle">homebrew archenemy tracker</div></div>' +
+      '</div>';
+  }
+
+  function renderTabBar(){
+    function tab(id, label){ return '<button class="' + (activeTab === id ? 'active' : '') + '" onclick="App.switchTab(\'' + id + '\')">' + label + '</button>'; }
+    return '<div class="tabbar">' + tab('table', 'Table') + tab('cards', 'Cards') + tab('rules', 'Rules') + '</div>';
+  }
+
+  function renderTable(){
+    var html = '';
+    html += '<div class="turn-panel">';
+    html += '<div class="turn-label">Archenemy turn</div>';
+    html += '<div class="turn-number">' + game.turn + '</div>';
+    html += '<div class="turn-controls">';
+    html += '<button class="btn btn-ghost" onclick="App.prevTurn()">−</button>';
+    html += '<button class="btn btn-primary" onclick="App.nextTurn()">Next turn →</button>';
+    html += '</div>';
+    var eligible = isEligible();
+    if (eligible){ html += '<div class="eligibility lit">Eligible to draw a scheme</div>'; }
+    else { html += '<div class="eligibility unlit">Next eligible: turn ' + nextEligibleTurn() + '</div>'; }
+    html += '</div>';
+
+    if (library.cards.length === 0){
+      html += '<div class="empty-note">No schemes yet. Add some in the Cards tab before you start a game.</div>';
+    } else {
+      var disabled = !eligible || game.drawnThisTurn || game.deck.length === 0;
+      html += '<button class="draw-btn" ' + (disabled ? 'disabled' : '') + ' onclick="App.drawScheme()">Draw a Scheme</button>';
+      var hint = '';
+      if (!eligible) hint = 'Not eligible this turn.';
+      else if (game.drawnThisTurn) hint = 'Already drawn this turn — tap Next turn to continue.';
+      else if (game.deck.length === 0) hint = 'No schemes left in the deck. Abandon an ongoing scheme, or reshuffle in Rules.';
+      html += '<div class="draw-hint">' + hint + '</div>';
+
+      if (game.lastDrawn){
+        var d = game.lastDrawn;
+        var revealClass = '';
+        if (justDrawnAnimation){ revealClass = 'reveal'; justDrawnAnimation = false; }
+        html += '<div class="scheme-card ' + revealClass + '">';
+        html += '<div class="scheme-card-name">' + esc(d.name) + '</div>';
+        html += '<div class="scheme-card-art-wrap">' + renderArtBox(d.art, 'card') + '</div>';
+        html += '<div class="scheme-card-type">' + (d.type === 'ongoing' ? 'Ongoing Scheme' : 'One-shot Scheme') + '</div>';
+        html += '<div class="scheme-card-text">' + esc(d.text) + '</div>';
+        html += '</div>';
+        html += '<div class="scheme-card-actions-row"><button class="btn btn-primary btn-block" onclick="App.dismissLastDrawn()">' + (d.type === 'ongoing' ? 'Set in play' : 'Resolved') + '</button></div>';
+      }
+
+      if (game.ongoing.length > 0){
+        html += '<div class="section-label">In play (' + game.ongoing.length + ')</div>';
+        game.ongoing.forEach(function(o){
+          var card = null;
+          for (var i = 0; i < library.cards.length; i++){ if (library.cards[i].id === o.cardId){ card = library.cards[i]; break; } }
+          if (!card) return;
+          html += '<div class="ongoing-item"><div class="ongoing-item-main">' + renderArtBox(card.art, 'thumb') + '<span>' + esc(card.name) + '</span></div><button class="btn btn-ghost" onclick="App.abandonOngoing(\'' + o.id + '\')">Abandon</button></div>';
+        });
+      }
+
+      if (game.history.length > 0){
+        html += '<details class="history"><summary>Scroll of deeds (' + game.history.length + ')</summary>';
+        game.history.slice(0, 30).forEach(function(h){
+          html += '<div class="history-item">Turn ' + h.turn + ' — ' + esc(h.name) + ' (' + (h.type === 'ongoing' ? 'ongoing' : 'one-shot') + ')</div>';
+        });
+        html += '</details>';
+      }
+
+      html += '<div class="deck-footer">' + game.deck.length + ' in deck · ' + game.ongoing.length + ' in play</div>';
+    }
+    return html;
+  }
+
+  function renderCards(){
+    var html = '';
+    var totalCopies = 0;
+    library.cards.forEach(function(c){ totalCopies += Math.max(1, c.qty || 1); });
+
+    html += '<div class="cards-header"><div class="cards-count">' + library.cards.length + ' schemes · ' + totalCopies + ' copies in deck</div>';
+    html += '<div class="cards-header-actions"><button class="btn btn-ghost" onclick="App.toggleBulk()">' + (bulkMode ? 'Close bulk edit' : 'Bulk edit') + '</button>';
+    if (!bulkMode) html += '<button class="btn btn-primary" onclick="App.openCardForm()">+ Add scheme</button>';
+    html += '</div></div>';
+
+    if (bulkMode){
+      html += '<div class="form-panel">';
+      html += '<div class="hint">One card per block. Keep the Name / Type / Qty / Text lines, and separate cards with a line of three dashes (---). Art is not shown here — saving matches cards by name to keep any art already attached.</div>';
+      html += '<textarea id="bulk-text">' + esc(exportCardsAsText()) + '</textarea>';
+      html += '<div class="bulk-actions"><button class="btn btn-primary" onclick="App.saveBulkCards()">Save all</button><button class="btn btn-ghost" onclick="App.toggleBulk()">Cancel</button></div>';
+      html += '</div>';
+      return html;
+    }
+
+    if (cardForm){
+      var f = cardForm;
+      html += '<div class="form-panel">';
+      html += '<label>Name</label><input type="text" id="cf-name" value="' + esc(f.name) + '" placeholder="e.g. The Ring Calls">';
+      html += '<label>Art</label>';
+      html += renderArtBox(f.art, 'form');
+      html += '<div class="art-upload-actions">';
+      html += '<label class="btn btn-ghost file-btn">Choose photo<input type="file" accept="image/png,image/jpeg,image/webp,image/gif" style="display:none" onchange="App.onArtFileSelected(this)"></label>';
+      if (f.art) html += '<button class="btn btn-ghost" onclick="App.removeArt()">Remove art</button>';
+      html += '</div>';
+      html += '<label>Effect text</label><textarea id="cf-text" placeholder="What happens when this scheme is set in motion?">' + esc(f.text) + '</textarea>';
+      html += '<label>Type</label><div class="type-toggle">';
+      html += '<button class="' + (f.type === 'oneshot' ? 'active' : '') + '" onclick="App.setFormType(\'oneshot\')">One-shot</button>';
+      html += '<button class="' + (f.type === 'ongoing' ? 'active' : '') + '" onclick="App.setFormType(\'ongoing\')">Ongoing</button>';
+      html += '</div>';
+      html += '<label>Copies in deck</label><input type="number" id="cf-qty" min="1" max="10" value="' + (f.qty || 1) + '">';
+      html += '<div class="form-actions">';
+      html += '<button class="btn btn-primary" onclick="App.saveCardForm()">Save</button>';
+      if (f.id){ html += '<button class="btn btn-danger" onclick="App.deleteCardConfirm(\'' + f.id + '\')">' + (pendingDeleteId === f.id ? 'Confirm delete?' : 'Delete') + '</button>'; }
+      html += '<button class="btn btn-ghost" onclick="App.closeCardForm()">Cancel</button>';
+      html += '</div></div>';
+    }
+
+    if (library.cards.length === 0 && !cardForm){
+      html += '<div class="empty-note">No schemes yet. Tap "Add scheme" to write your first one.</div>';
+    } else {
+      library.cards.forEach(function(c){
+        html += '<div class="card-row" onclick="App.openCardForm(\'' + c.id + '\')">';
+        html += renderArtBox(c.art, 'thumb');
+        html += '<div class="card-row-main"><span class="badge ' + c.type + '">' + (c.type === 'ongoing' ? 'Ongoing' : 'One-shot') + '</span><span class="card-row-name">' + esc(c.name) + '</span></div>';
+        html += '<div class="card-row-qty">×' + (c.qty || 1) + '</div>';
+        html += '</div>';
+      });
+      html += '<div class="hint">New or edited schemes join the deck next time you reshuffle (see Rules tab).</div>';
+    }
+    return html;
+  }
+
+  function renderRules(){
+    var html = '';
+    html += '<div class="rules-section">';
+    html += '<div class="section-label">Draw timing</div>';
+    html += '<div class="rules-row"><label>First eligible turn</label><input type="number" id="rule-start" min="0" value="' + library.rules.startTurn + '"></div>';
+    html += '<div class="rules-row"><label>Then draw every … turn(s)</label><input type="number" id="rule-interval" min="1" value="' + library.rules.interval + '"></div>';
+    html += '<button class="btn btn-primary" onclick="App.saveRules()">Save timing</button>';
+    html += '<div class="hint">1 and 1 draws every turn from the start (classic Archenemy). 2 and 1 skips turn 1, then draws every turn after. 5 and 5 draws only on turns 5, 10, 15…</div>';
+    html += '</div>';
+
+    html += '<div class="rules-section">';
+    html += '<div class="section-label">Deck</div>';
+    html += '<button class="btn btn-ghost" onclick="App.reshuffleNow()">Reshuffle deck</button>';
+    html += '<button class="btn btn-danger" onclick="App.confirmNewGame()">' + (pendingNewGame ? 'Confirm new game?' : 'Start new game') + '</button>';
+    html += '<div class="hint">Reshuffle keeps the turn count and just remixes the deck. Start new game resets the turn counter, deck, ongoing schemes and history.</div>';
+    html += '</div>';
+
+    html += '<div class="rules-section">';
+    html += '<div class="section-label">Backup</div>';
+    html += '<div class="hint">Saving to: ' + (STORAGE_MODE === 'claude' ? 'your Claude account' : 'this browser, on this device') + '. ' + (STORAGE_MODE === 'local' ? 'Nothing is sent anywhere — use a backup code to move your deck to another phone or share it with someone else.' : '') + '</div>';
+    html += '<button class="btn btn-ghost" onclick="App.toggleBackup()">' + (showBackup ? 'Hide' : 'Show') + ' backup code</button>';
+    if (showBackup){
+      var dump = JSON.stringify({ library: library, game: game });
+      html += '<textarea id="backup-out" readonly onclick="this.select()">' + esc(dump) + '</textarea>';
+      html += '<button class="btn btn-ghost" onclick="App.copyBackup()">Copy</button>';
+      html += '<div class="hint">Copy this somewhere safe. To restore on another device, paste a backup below and tap Restore — this replaces everything currently saved.</div>';
+      html += '<textarea id="backup-in" placeholder="Paste backup code here"></textarea>';
+      html += '<button class="btn btn-primary" onclick="App.doImport()">Restore from code</button>';
+    }
+    html += '</div>';
+
+    if (storageError){
+      html += '<div class="hint">Heads up: changes could not be saved just now. Keep this tab open, or copy a backup code above so nothing is lost.</div>';
+    }
+    return html;
+  }
+
+  function render(){
+    var app = document.getElementById('app');
+    var body = activeTab === 'table' ? renderTable() : activeTab === 'cards' ? renderCards() : renderRules();
+    app.innerHTML = renderHeader() + body + renderTabBar();
+  }
+
+  window.App = {
+    switchTab: switchTab, nextTurn: nextTurn, prevTurn: prevTurn, drawScheme: drawScheme,
+    dismissLastDrawn: dismissLastDrawn, abandonOngoing: abandonOngoing,
+    openCardForm: openCardForm, closeCardForm: closeCardForm, setFormType: setFormType,
+    saveCardForm: saveCardForm, deleteCardConfirm: deleteCardConfirm, saveRules: saveRules,
+    confirmNewGame: confirmNewGame, reshuffleNow: reshuffleNow, toggleBackup: toggleBackup,
+    copyBackup: copyBackup, doImport: doImport, onArtFileSelected: onArtFileSelected, removeArt: removeArt,
+    toggleBulk: toggleBulk, saveBulkCards: saveBulkCards
+  };
+
+  var appStarted = false;
+  loadAll().then(function(){ appStarted = true; }).catch(function(e){
+    console.error('Scheme Keeper: loadAll failed', e);
+    if (!library) library = defaultLibrary();
+    if (!game) game = defaultGame();
+    storageError = true;
+    appStarted = true;
+    render();
+  });
+  setTimeout(function(){
+    if (!appStarted){
+      console.error('Scheme Keeper: load timed out, forcing a fallback render');
+      if (!library) library = defaultLibrary();
+      if (!game) game = defaultGame();
+      storageError = true;
+      appStarted = true;
+      render();
+    }
+  }, 6000);
+})();
+</script>
+</body>
+</html>
