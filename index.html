@@ -3,30 +3,32 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#15191A">
-<title>Scheme Keeper — Archenemy Tracker</title>
+<meta name="theme-color" content="#12180F">
+<title>Arbeider Archenemy</title>
 <style>
   :root{
-    --ink:#15191A;
-    --ink-deep:#0D0F10;
+    --ink:#12180F;
+    --ink-deep:#080B06;
     --parchment:#E6D9B8;
     --parchment-hi:#F2E8CB;
     --brass:#A9803E;
     --brass-bright:#D8AE66;
     --ember:#9C4630;
+    --moss:#4B6B3A;
+    --moss-bright:#7A9B5E;
     --text-dark:#2B2416;
     --text-light:#E9E2CC;
-    --muted:#7C8A79;
+    --muted:#84927E;
     --panel-border:rgba(169,128,62,0.35);
-    --font-display:Georgia,'Iowan Old Style','Palatino Linotype',serif;
-    --font-body:Georgia,'Iowan Old Style',serif;
+    --font-display:'Copperplate','Herculanum','Trajan Pro',Georgia,'Palatino Linotype',serif;
+    --font-body:'Palatino Linotype','Book Antiqua',Palatino,Georgia,'Iowan Old Style',serif;
     --font-ui:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
   }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
   body{
     min-height:100vh;
-    background: radial-gradient(ellipse at top, #1c211f 0%, var(--ink) 55%, var(--ink-deep) 100%);
+    background: radial-gradient(ellipse at top, #1a2317 0%, var(--ink) 55%, var(--ink-deep) 100%);
     color:var(--text-light);
     font-family:var(--font-ui);
     -webkit-font-smoothing:antialiased;
@@ -36,40 +38,59 @@
   input,textarea{font-family:inherit;}
 
   /* header */
-  .topbar{display:flex;align-items:center;gap:12px;margin-bottom:20px;}
+  .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;}
+  .topbar-left{display:flex;align-items:center;gap:12px;min-width:0;}
   .seal-mini{width:38px;height:38px;flex-shrink:0;}
   .app-title{font-family:var(--font-display);font-size:19px;letter-spacing:0.07em;text-transform:uppercase;color:var(--brass-bright);}
   .app-subtitle{font-size:11px;color:var(--muted);letter-spacing:0.03em;margin-top:2px;}
+  .gear-btn{background:none;border:1px solid var(--panel-border);color:var(--brass-bright);font-size:17px;width:34px;height:34px;border-radius:8px;flex-shrink:0;line-height:1;}
+  .game-menu{display:flex;flex-direction:column;gap:8px;background:rgba(255,255,255,0.03);border:1px solid var(--panel-border);border-radius:10px;padding:10px;margin-bottom:14px;}
 
-  /* turn panel */
-  .turn-panel{text-align:center;background:linear-gradient(180deg,rgba(169,128,62,0.08),transparent);border:1px solid var(--panel-border);border-radius:14px;padding:22px 16px;margin-bottom:16px;}
-  .turn-label{font-size:11px;text-transform:uppercase;letter-spacing:0.15em;color:var(--muted);margin-bottom:2px;}
-  .turn-number{font-family:var(--font-display);font-size:54px;line-height:1;color:var(--parchment-hi);text-shadow:0 0 24px rgba(216,174,102,0.22);}
-  .turn-controls{display:flex;gap:10px;justify-content:center;margin-top:14px;}
+  /* compact turn + eligibility bar */
+  .control-bar{display:flex;align-items:center;justify-content:space-between;gap:10px;background:rgba(255,255,255,0.03);border:1px solid var(--panel-border);border-radius:10px;padding:8px 12px;margin-bottom:10px;}
+  .turn-mini{display:flex;align-items:center;gap:8px;}
+  .turn-mini-label{font-size:13px;color:var(--text-light);}
+  .turn-mini-label strong{font-family:var(--font-display);font-size:17px;color:var(--parchment-hi);margin:0 3px;}
+  .mini-btn{width:26px;height:26px;border-radius:7px;border:1px solid var(--panel-border);background:rgba(255,255,255,0.03);color:var(--text-light);font-size:15px;line-height:1;padding:0;flex-shrink:0;}
+  .eligibility-mini{font-size:11px;white-space:nowrap;}
+  .eligibility-mini.lit{color:var(--brass-bright);}
+  .eligibility-mini.unlit{color:var(--muted);}
+
   .btn{padding:10px 16px;border-radius:9px;border:1px solid var(--panel-border);background:rgba(255,255,255,0.03);color:var(--text-light);font-size:14px;}
-  .btn-primary{background:linear-gradient(180deg,var(--brass-bright),var(--brass));color:var(--ink-deep);border:none;font-weight:600;}
+  .btn-primary{background:linear-gradient(180deg,var(--brass-bright),var(--brass));color:var(--ink-deep);border:none;font-weight:600;box-shadow:inset 0 1px 0 rgba(255,255,255,0.3),inset 0 -2px 3px rgba(0,0,0,0.2);}
   .btn-ghost{background:none;border:1px solid var(--panel-border);color:var(--text-light);}
   .btn-danger{background:none;border:1px solid var(--ember);color:#e0a08f;}
   .btn-block{display:block;width:100%;}
-  .eligibility{margin-top:14px;font-size:13px;}
-  .eligibility.lit{color:var(--brass-bright);}
-  .eligibility.lit::before{content:'●';margin-right:6px;text-shadow:0 0 8px var(--brass-bright);}
-  .eligibility.unlit{color:var(--muted);}
-  .eligibility.unlit::before{content:'○';margin-right:6px;}
+
+  /* start screen */
+  .start-screen{text-align:center;padding:56px 16px 30px;}
+  .start-title{font-family:var(--font-display);font-size:21px;color:var(--parchment-hi);margin:16px 0 6px;}
+  .start-sub{font-size:13px;color:var(--muted);margin-bottom:26px;}
 
   /* draw button + helper */
-  .draw-btn{display:block;width:100%;padding:16px;font-size:16px;font-weight:600;letter-spacing:0.02em;background:linear-gradient(180deg,var(--brass-bright),var(--brass));color:var(--ink-deep);border:none;border-radius:12px;margin-bottom:6px;}
+  .draw-btn{display:block;width:100%;padding:11px;font-size:14px;font-weight:600;letter-spacing:0.02em;background:linear-gradient(180deg,var(--brass-bright),var(--brass));color:var(--ink-deep);border:none;border-radius:10px;margin-bottom:4px;}
   .draw-btn:disabled{background:#2c2e29;color:var(--muted);}
-  .draw-hint{font-size:12px;color:var(--muted);text-align:center;margin-bottom:14px;min-height:14px;}
+  .draw-hint{font-size:11px;color:var(--muted);text-align:center;margin-bottom:10px;min-height:12px;}
 
-  /* scheme reveal card */
-  .scheme-card{background:var(--parchment);color:var(--text-dark);border-radius:10px;overflow:hidden;box-shadow:0 14px 32px rgba(0,0,0,0.42);position:relative;border:1px solid rgba(43,36,22,0.25);aspect-ratio:1.45/1;display:flex;flex-direction:column;margin:14px 0 10px;}
-  .scheme-card-name{font-family:var(--font-display);font-size:16px;padding:8px 12px 6px;background:linear-gradient(180deg,var(--parchment-hi),var(--parchment));flex:0 0 auto;}
-  .scheme-card-art-wrap{flex:0 0 42%;overflow:hidden;}
+  /* scheme reveal card - vertical, like a real card */
+  .scheme-card{background:var(--parchment);color:var(--text-dark);border-radius:10px;overflow:hidden;box-shadow:0 14px 32px rgba(0,0,0,0.42);position:relative;border:1px solid rgba(43,36,22,0.25);display:flex;flex-direction:column;margin:14px 0 10px;}
+  .scheme-card::after{content:'';position:absolute;inset:0;pointer-events:none;mix-blend-mode:multiply;background:
+    radial-gradient(circle at 18% 82%, rgba(90,65,25,0.16) 0%, transparent 30%),
+    radial-gradient(circle at 84% 14%, rgba(90,65,25,0.12) 0%, transparent 26%),
+    radial-gradient(circle at 55% 94%, rgba(90,65,25,0.10) 0%, transparent 22%),
+    radial-gradient(circle at 6% 28%, rgba(90,65,25,0.09) 0%, transparent 20%);}
+  .scheme-card-name{font-family:var(--font-display);font-size:18px;padding:10px 14px 6px;background:linear-gradient(180deg,var(--parchment-hi),var(--parchment));flex:0 0 auto;}
+  .scheme-card-name-text{}
+  .scheme-card.special-one-ring{border:2px solid var(--brass-bright);box-shadow:0 0 30px rgba(216,174,102,0.55),0 14px 32px rgba(0,0,0,0.5);}
+  .scheme-card.special-one-ring .scheme-card-name{background:linear-gradient(180deg,#1c0f05,#0d0602);}
+  .scheme-card.special-one-ring .scheme-card-name-text{background-image:linear-gradient(180deg,#ffe29a,var(--brass-bright) 60%,#8a5a1e);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent;text-shadow:0 0 10px rgba(255,200,100,0.5);}
+  .scheme-card-art-wrap{width:100%;aspect-ratio:16/9;overflow:hidden;flex:0 0 auto;}
   .scheme-card-art{width:100%;height:100%;}
   .scheme-card-art svg,.scheme-card-art img{width:100%;height:100%;object-fit:cover;display:block;}
-  .scheme-card-type{font-size:10px;text-transform:uppercase;letter-spacing:0.1em;color:var(--ember);font-weight:700;padding:5px 12px;background:var(--parchment);border-top:1px solid rgba(43,36,22,0.15);border-bottom:1px solid rgba(43,36,22,0.15);flex:0 0 auto;}
-  .scheme-card-text{flex:1;padding:8px 12px 10px;overflow-y:auto;font-family:var(--font-body);font-size:13px;line-height:1.45;background:var(--parchment);white-space:pre-wrap;}
+  .scheme-card-type{font-size:10px;text-transform:uppercase;letter-spacing:0.1em;font-weight:700;padding:6px 14px;background:var(--parchment);border-top:1px solid rgba(43,36,22,0.15);border-bottom:1px solid rgba(43,36,22,0.15);flex:0 0 auto;}
+  .scheme-card-type.oneshot{color:var(--ember);}
+  .scheme-card-type.ongoing{color:var(--moss);}
+  .scheme-card-text{padding:10px 14px 16px;max-height:280px;overflow-y:auto;font-family:var(--font-body);font-size:14px;line-height:1.5;background:var(--parchment);white-space:pre-wrap;flex:0 0 auto;}
   .scheme-card-actions-row{margin:0 0 20px;}
   .scheme-card.reveal{animation:unfurl .55s cubic-bezier(.2,.7,.3,1) both;transform-origin:top center;}
   @keyframes unfurl{0%{transform:scaleY(.08);opacity:0}55%{transform:scaleY(1.04);opacity:1}100%{transform:scaleY(1);opacity:1}}
@@ -103,10 +124,13 @@
   .cards-count{font-size:12px;color:var(--muted);}
   .card-row{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,0.03);border:1px solid var(--panel-border);border-radius:10px;padding:12px 14px;margin-bottom:8px;}
   .card-row-main{display:flex;flex-direction:column;gap:4px;min-width:0;flex:1;}
+  .card-row-badges{display:flex;gap:6px;flex-wrap:wrap;}
   .card-row-name{font-family:var(--font-display);font-size:15px;color:var(--parchment-hi);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .badge{font-size:10px;text-transform:uppercase;letter-spacing:0.08em;padding:2px 7px;border-radius:20px;width:fit-content;}
   .badge.oneshot{background:rgba(216,174,102,0.15);color:var(--brass-bright);}
-  .badge.ongoing{background:rgba(156,70,48,0.2);color:#e0a08f;}
+  .badge.ongoing{background:rgba(75,107,58,0.25);color:var(--moss-bright);}
+  .badge.first-turn{background:none;border:1px solid var(--ember);color:#e0a08f;}
+  .badge.special{background:none;border:1px solid var(--brass-bright);color:var(--brass-bright);}
   .card-row-qty{font-size:13px;color:var(--muted);flex-shrink:0;}
 
   /* forms */
@@ -135,7 +159,8 @@
   /* tab bar */
   .tabbar{position:fixed;bottom:0;left:0;right:0;display:flex;background:var(--ink-deep);border-top:1px solid var(--panel-border);padding-bottom:env(safe-area-inset-bottom);z-index:10;}
   .tabbar button{flex:1;padding:14px 0 12px;background:none;border:none;color:var(--muted);font-size:12px;letter-spacing:0.04em;}
-  .tabbar button.active{color:var(--brass-bright);}
+  .tabbar button.active{color:var(--brass-bright);position:relative;}
+  .tabbar button.active::after{content:'';position:absolute;bottom:3px;left:50%;transform:translateX(-50%);width:16px;height:2px;background:var(--brass-bright);border-radius:2px;}
   .loading{text-align:center;padding:60px 20px;color:var(--muted);font-size:14px;}
 </style>
 </head>
@@ -156,6 +181,7 @@
   var pendingNewGame = false;
   var showBackup = false;
   var bulkMode = false;
+  var showGameMenu = false;
   var justDrawnAnimation = false;
   var storageError = false;
   var STORAGE_MODE = 'local';
@@ -208,15 +234,12 @@
 
   function defaultLibrary(){
     return {
-      cards: [
-        { id: uid(), name: 'The Watcher Stirs', text: 'Example one-shot scheme. Tap this card to edit its name and effect text, or add your own below.', type: 'oneshot', qty: 1, art: null },
-        { id: uid(), name: 'A Shadow Lingers', text: 'Example ongoing scheme. Ongoing schemes stay face up until you abandon them from the Table tab.', type: 'ongoing', qty: 1, art: null }
-      ],
+      cards: [],
       rules: { startTurn: 1, interval: 1 }
     };
   }
   function defaultGame(){
-    return { turn: 0, deck: [], ongoing: [], drawnThisTurn: false, lastDrawn: null, history: [] };
+    return { turn: 1, started: false, deck: [], starterDeck: [], ongoing: [], drawnThisTurn: false, lastDrawn: null, history: [] };
   }
 
   function shuffle(arr){
@@ -235,7 +258,148 @@
       text: 'When you set this scheme in motion, destroy up to two target creatures. For each creature that died this way, its controller creates a Food token.\n(Food is an artifact token with "{2}, {T}, Sacrifice this artifact: You gain 3 life.")',
       type: 'oneshot',
       qty: 1,
-      art: '<svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="wg1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0d1512"/><stop offset="100%" stop-color="#1f2f24"/></linearGradient><linearGradient id="tg1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#42513c"/><stop offset="100%" stop-color="#212b1e"/></linearGradient></defs><rect width="400" height="200" fill="url(#wg1)"/><path d="M0,158 Q50,148 100,158 T200,158 T300,158 T400,158" stroke="#4a5d4f" stroke-width="2" fill="none" opacity="0.4"/><path d="M0,172 Q50,164 100,172 T200,172 T300,172 T400,172" stroke="#3a4a3f" stroke-width="2" fill="none" opacity="0.3"/><path d="M55,200 C48,150 82,110 66,55 C61,38 78,28 88,34 C80,72 96,116 112,150 C122,172 100,192 55,200 Z" fill="url(#tg1)" stroke="#A9803E" stroke-width="1"/><path d="M300,200 C292,152 328,118 308,64 C302,48 322,42 328,58 C316,94 332,138 344,172 C350,190 326,198 300,200 Z" fill="url(#tg1)" stroke="#A9803E" stroke-width="1" opacity="0.92"/><path d="M175,200 C188,158 162,120 186,80 C196,64 214,70 208,84 C192,112 204,150 214,182 C218,195 198,200 175,200 Z" fill="url(#tg1)" stroke="#A9803E" stroke-width="0.9" opacity="0.88"/><path d="M232,200 C244,175 236,150 258,132 C268,124 280,132 273,141 C258,157 262,180 250,200 Z" fill="url(#tg1)" stroke="#A9803E" stroke-width="0.8" opacity="0.8"/><circle cx="140" cy="118" r="3" fill="#D8AE66" opacity="0.4"/><circle cx="262" cy="92" r="2.2" fill="#D8AE66" opacity="0.35"/><circle cx="330" cy="128" r="2.6" fill="#D8AE66" opacity="0.3"/></svg>'
+      art: '<svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg"><defs><filter id="soft" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="6"/></filter><filter id="softer" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="12"/></filter><radialGradient id="bg" cx="55%" cy="20%" r="90%"><stop offset="0%" stop-color="#233326"/><stop offset="55%" stop-color="#0a120d"/><stop offset="100%" stop-color="#020402"/></radialGradient><linearGradient id="tent" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#3a4d2a"/><stop offset="100%" stop-color="#050805"/></linearGradient></defs><rect width="400" height="200" fill="url(#bg)"/><ellipse cx="200" cy="40" rx="220" ry="30" fill="#3a5540" opacity="0.25" filter="url(#softer)"/><path d="M70,200 C60,140 100,95 80,45 C95,60 115,110 130,150 C140,175 115,195 70,200 Z" fill="url(#tent)" filter="url(#soft)"/><path d="M320,200 C332,150 300,110 315,60 C300,80 285,125 275,160 C268,182 290,197 320,200 Z" fill="url(#tent)" filter="url(#soft)" opacity="0.92"/><path d="M200,200 C210,160 185,130 200,95 C188,112 178,148 182,175 C184,190 195,198 200,200 Z" fill="url(#tent)" filter="url(#soft)" opacity="0.85"/><circle cx="120" cy="70" r="2" fill="#c8e0a0" opacity="0.35"/><circle cx="260" cy="55" r="2.4" fill="#c8e0a0" opacity="0.3"/></svg>'
+    },
+    {
+      seedId: 'seed-fellowship-scatters-v1',
+      name: 'The Fellowship Scatters',
+      text: 'When you set this scheme in motion, each opponent sacrifices a creature.',
+      type: 'oneshot', qty: 1, art: '<svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg"><defs><filter id="fs1" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="7"/></filter><filter id="fs2" x="-300%" y="-300%" width="700%" height="700%"><feGaussianBlur stdDeviation="2.5"/></filter><radialGradient id="fsbg" cx="45%" cy="40%" r="80%"><stop offset="0%" stop-color="#232838"/><stop offset="100%" stop-color="#04050a"/></radialGradient></defs><rect width="400" height="200" fill="url(#fsbg)"/><path d="M175,90 Q200,75 225,90 L232,120 Q235,145 220,165 L215,190 L185,190 L180,165 Q165,145 168,120 Z" fill="#0a0a12" filter="url(#fs1)"/><g fill="#aab4d0" filter="url(#fs2)"><circle cx="245" cy="85" r="3" opacity="0.75"/><circle cx="265" cy="65" r="2.2" opacity="0.6"/><circle cx="280" cy="100" r="2.6" opacity="0.65"/><circle cx="260" cy="130" r="2" opacity="0.55"/><circle cx="295" cy="75" r="1.8" opacity="0.45"/><circle cx="140" cy="90" r="2.4" opacity="0.55"/><circle cx="120" cy="115" r="2" opacity="0.5"/><circle cx="105" cy="80" r="1.6" opacity="0.4"/><circle cx="270" cy="150" r="1.6" opacity="0.4"/><circle cx="150" cy="140" r="1.5" opacity="0.4"/></g></svg>'
+    },
+    {
+      seedId: 'seed-shelobs-ambush-v1',
+      name: 'Shelob\'s Ambush',
+      text: 'When you set this scheme in motion, destroy target creature. If that creature had power 4 or greater, its controller loses 3 life.',
+      type: 'oneshot', qty: 1, art: '<svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg"><defs><filter id="fogblur" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="14"/></filter><filter id="legblur" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="5"/></filter><filter id="eyeglow" x="-150%" y="-150%" width="400%" height="400%"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter><radialGradient id="bg" cx="55%" cy="60%" r="80%"><stop offset="0%" stop-color="#14180c"/><stop offset="55%" stop-color="#080a05"/><stop offset="100%" stop-color="#020302"/></radialGradient><radialGradient id="bodyshade" cx="40%" cy="30%" r="70%"><stop offset="0%" stop-color="#2a3218"/><stop offset="100%" stop-color="#050702"/></radialGradient></defs><rect width="400" height="200" fill="url(#bg)"/><g filter="url(#legblur)" opacity="0.55" stroke="#1c2410" stroke-width="10" stroke-linecap="round" fill="none"><path d="M120,150 Q60,120 10,140"/><path d="M130,170 Q70,175 20,195"/><path d="M290,150 Q350,120 395,145"/><path d="M280,170 Q345,178 390,198"/></g><ellipse cx="205" cy="130" rx="130" ry="85" fill="#050603" filter="url(#fogblur)" opacity="0.9"/><ellipse cx="200" cy="110" rx="75" ry="52" fill="url(#bodyshade)" filter="url(#fogblur)"/><ellipse cx="195" cy="70" rx="30" ry="24" fill="#171f0e" filter="url(#legblur)"/><circle cx="184" cy="66" r="4.5" fill="#ff9d3d" filter="url(#eyeglow)"/><circle cx="206" cy="66" r="4.5" fill="#ff9d3d" filter="url(#eyeglow)"/><circle cx="178" cy="74" r="2.6" fill="#e8641c" filter="url(#eyeglow)" opacity="0.85"/><circle cx="212" cy="74" r="2.6" fill="#e8641c" filter="url(#eyeglow)" opacity="0.85"/></svg>'
+    },
+    {
+      seedId: 'seed-cast-into-the-fire-v1',
+      name: 'Cast into the Fire',
+      text: 'When you set this scheme in motion, exile target nonland permanent.',
+      type: 'oneshot', qty: 1, art: '<svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg"><defs><filter id="cf1" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="14"/></filter><filter id="cf2" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="3"/></filter><radialGradient id="cfbg" cx="50%" cy="75%" r="85%"><stop offset="0%" stop-color="#5a2408"/><stop offset="100%" stop-color="#050201"/></radialGradient><linearGradient id="cfflame" x1="0" y1="1" x2="0" y2="0"><stop offset="0%" stop-color="#6b2408"/><stop offset="45%" stop-color="#e8641c"/><stop offset="85%" stop-color="#ffb84d"/><stop offset="100%" stop-color="#fff3d0"/></linearGradient></defs><rect width="400" height="200" fill="url(#cfbg)"/><ellipse cx="200" cy="175" rx="130" ry="35" fill="#ff9d3d" opacity="0.45" filter="url(#cf1)"/><path d="M200,195 C155,160 165,120 188,95 C182,118 198,128 203,112 C213,132 232,124 226,100 C252,128 248,165 212,195 Z" fill="url(#cfflame)" filter="url(#cf2)"/><path d="M200,195 C178,175 183,150 196,132 C194,145 202,150 205,142 C211,153 220,148 217,135 C230,150 228,172 208,195 Z" fill="#ffe9b0" opacity="0.55" filter="url(#cf2)"/></svg>'
+    },
+    {
+      seedId: 'seed-frost-of-caradhras-v1',
+      name: 'Frost of Caradhras',
+      text: 'When you set this scheme in motion, creatures your opponents control get -2/-0 until end of turn.',
+      type: 'oneshot', qty: 1, art: '<svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg"><defs><filter id="fr1" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="9"/></filter><filter id="fr2" x="-200%" y="-200%" width="500%" height="500%"><feGaussianBlur stdDeviation="3"/></filter><linearGradient id="frbg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#173042"/><stop offset="100%" stop-color="#020608"/></linearGradient></defs><rect width="400" height="200" fill="url(#frbg)"/><ellipse cx="230" cy="60" rx="90" ry="40" fill="#bfe6ff" opacity="0.3" filter="url(#fr1)"/><path d="M60,200 L140,70 L185,130 L230,40 L280,120 L320,80 L370,200 Z" fill="#0c1620" filter="url(#fr1)"/><path d="M230,40 L245,65 L220,70 Z" fill="#eaf6ff" opacity="0.6" filter="url(#fr2)"/><g fill="#eaf6ff" filter="url(#fr2)"><circle cx="90" cy="90" r="1.6" opacity="0.6"/><circle cx="310" cy="110" r="1.8" opacity="0.55"/><circle cx="150" cy="60" r="1.4" opacity="0.5"/><circle cx="270" cy="70" r="1.5" opacity="0.5"/><circle cx="200" cy="150" r="1.6" opacity="0.4"/></g></svg>'
+    },
+    {
+      seedId: 'seed-whispers-of-the-ringwraiths-v1',
+      name: 'Whispers of the Ringwraiths',
+      text: 'When you set this scheme in motion, each opponent discards two cards.',
+      type: 'oneshot', qty: 1, art: '<svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg"><defs><filter id="wr1" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="8"/></filter><filter id="wr2" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="4"/></filter><radialGradient id="wrbg" cx="50%" cy="30%" r="85%"><stop offset="0%" stop-color="#1c2038"/><stop offset="100%" stop-color="#030309"/></radialGradient></defs><rect width="400" height="200" fill="url(#wrbg)"/><path d="M140,60 C165,60 178,90 172,120 C182,145 176,175 168,195 L112,195 C104,175 98,145 108,120 C102,90 115,60 140,60 Z" fill="#0a0a16" opacity="0.5" filter="url(#wr1)"/><path d="M200,45 C230,45 245,80 238,115 C250,145 244,180 235,198 L165,198 C156,180 150,145 162,115 C155,80 170,45 200,45 Z" fill="#0d0d1a" filter="url(#wr1)"/><path d="M270,60 C295,60 308,90 302,120 C312,145 306,175 298,195 L242,195 C234,175 228,145 238,120 C232,90 245,60 270,60 Z" fill="#0a0a16" opacity="0.5" filter="url(#wr1)"/><path d="M200,50 Q220,70 214,100" stroke="#5a6bb0" stroke-width="1.5" fill="none" opacity="0.45" filter="url(#wr2)"/></svg>'
+    },
+    {
+      seedId: 'seed-counsel-of-the-white-council-v1',
+      name: 'Counsel of the White Council',
+      text: 'When you set this scheme in motion, draw three cards.',
+      type: 'oneshot', qty: 1, art: '<svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg"><defs><filter id="cw1" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="14"/></filter><filter id="cw2" x="-200%" y="-200%" width="500%" height="500%"><feGaussianBlur stdDeviation="3"/></filter><radialGradient id="cwbg" cx="50%" cy="60%" r="80%"><stop offset="0%" stop-color="#3a2c10"/><stop offset="100%" stop-color="#050402"/></radialGradient><linearGradient id="cwpage" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#fff3d0"/><stop offset="100%" stop-color="#c9a05a"/></linearGradient></defs><rect width="400" height="200" fill="url(#cwbg)"/><ellipse cx="200" cy="140" rx="100" ry="35" fill="#ffd166" opacity="0.35" filter="url(#cw1)"/><path d="M200,155 L130,168 L130,120 Q165,108 200,116 Z" fill="url(#cwpage)"/><path d="M200,155 L270,168 L270,120 Q235,108 200,116 Z" fill="url(#cwpage)"/><g fill="#ffe9b0" filter="url(#cw2)"><circle cx="200" cy="80" r="2.2" opacity="0.7"/><circle cx="215" cy="55" r="1.8" opacity="0.6"/><circle cx="185" cy="60" r="1.6" opacity="0.55"/><circle cx="205" cy="35" r="1.4" opacity="0.45"/><circle cx="230" cy="90" r="1.5" opacity="0.4"/></g></svg>'
+    },
+    {
+      seedId: 'seed-gold-of-erebor-v1',
+      name: 'Gold of Erebor',
+      text: 'When you set this scheme in motion, create three tapped Treasure tokens.\n(Treasure tokens are artifacts with "{T}, Sacrifice this artifact: Add one mana of any color.")',
+      type: 'oneshot', qty: 1, firstTurnOnly: true, art: '<svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg"><defs><filter id="ge1" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="16"/></filter><filter id="ge2" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="3"/></filter><radialGradient id="gebg" cx="50%" cy="65%" r="75%"><stop offset="0%" stop-color="#4a3308"/><stop offset="100%" stop-color="#050301"/></radialGradient><radialGradient id="gecoin" cx="35%" cy="30%" r="75%"><stop offset="0%" stop-color="#ffe9b0"/><stop offset="100%" stop-color="#8a5a1e"/></radialGradient></defs><rect width="400" height="200" fill="url(#gebg)"/><ellipse cx="200" cy="150" rx="110" ry="35" fill="#ffb84d" opacity="0.5" filter="url(#ge1)"/><ellipse cx="200" cy="160" rx="95" ry="24" fill="#2a1c08" opacity="0.7" filter="url(#ge2)"/><circle cx="165" cy="145" r="24" fill="url(#gecoin)"/><circle cx="210" cy="152" r="28" fill="url(#gecoin)"/><circle cx="245" cy="135" r="20" fill="url(#gecoin)"/><circle cx="188" cy="122" r="16" fill="url(#gecoin)"/></svg>'
+    },
+    {
+      seedId: 'seed-ringwraiths-cry-v1',
+      name: 'The Ringwraiths\' Cry',
+      text: 'When you set this scheme in motion, each opponent loses 3 life. You gain life equal to the total life lost this way.',
+      type: 'oneshot', qty: 1, art: '<svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg"><defs><filter id="rc1" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="10"/></filter><filter id="rc2" x="-200%" y="-200%" width="500%" height="500%"><feGaussianBlur stdDeviation="4"/></filter><radialGradient id="rcbg" cx="65%" cy="35%" r="80%"><stop offset="0%" stop-color="#3a0a0a"/><stop offset="100%" stop-color="#040101"/></radialGradient></defs><rect width="400" height="200" fill="url(#rcbg)"/><path d="M270,50 C298,50 312,80 306,112 C320,140 314,172 304,192 L226,192 C216,172 210,140 224,112 C218,80 242,50 270,50 Z" fill="#0e0303" filter="url(#rc1)"/><path d="M110,155 Q170,115 225,122" stroke="#d84a4a" stroke-width="4" fill="none" opacity="0.55" filter="url(#rc2)"/><circle cx="108" cy="156" r="7" fill="#e05a5a" opacity="0.6" filter="url(#rc2)"/><circle cx="150" cy="140" r="3" fill="#e05a5a" opacity="0.5" filter="url(#rc2)"/></svg>'
+    },
+    {
+      seedId: 'seed-last-stand-helms-deep-v1',
+      name: 'The Last Stand at Helm\'s Deep',
+      text: 'When you set this scheme in motion, prevent all combat damage that would be dealt to you this turn.',
+      type: 'oneshot', qty: 1, art: '<svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg"><defs><filter id="ls1" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="10"/></filter><filter id="ls2" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="6"/></filter><linearGradient id="lsbg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#3a2010"/><stop offset="45%" stop-color="#1a1416"/><stop offset="100%" stop-color="#040404"/></linearGradient></defs><rect width="400" height="200" fill="url(#lsbg)"/><path d="M40,200 L40,110 L70,95 L70,110 L100,95 L100,115 L130,90 L130,115 L170,80 L170,115 L230,115 L230,80 L270,115 L270,95 L300,115 L300,95 L330,110 L330,95 L360,110 L360,200 Z" fill="#0a0a0c" filter="url(#ls1)"/><circle cx="150" cy="130" r="14" fill="#ff9d3d" opacity="0.7" filter="url(#ls2)"/><circle cx="255" cy="130" r="14" fill="#ff9d3d" opacity="0.7" filter="url(#ls2)"/></svg>'
+    },
+    {
+      seedId: 'seed-army-of-the-dead-v1',
+      name: 'The Army of the Dead',
+      text: 'When you set this scheme in motion, create three 2/2 white Spirit creature tokens.',
+      type: 'oneshot', qty: 1, art: '<svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg"><defs><filter id="ad1" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="9"/></filter><filter id="ad2" x="-200%" y="-200%" width="500%" height="500%"><feGaussianBlur stdDeviation="4"/></filter><radialGradient id="adbg" cx="50%" cy="45%" r="85%"><stop offset="0%" stop-color="#12291c"/><stop offset="100%" stop-color="#020604"/></radialGradient></defs><rect width="400" height="200" fill="url(#adbg)"/><path d="M145,195 C138,150 150,110 165,110 C180,110 192,150 185,195 Z" fill="#5aa06e" opacity="0.22" filter="url(#ad1)"/><path d="M255,195 C248,150 260,110 275,110 C290,110 302,150 295,195 Z" fill="#5aa06e" opacity="0.22" filter="url(#ad1)"/><path d="M175,198 C165,140 182,80 200,80 C218,80 235,140 225,198 Z" fill="#8fd9a0" opacity="0.4" filter="url(#ad1)"/><circle cx="200" cy="86" r="8" fill="#c8f5d4" opacity="0.55" filter="url(#ad2)"/></svg>'
+    },
+    {
+      seedId: 'seed-horns-of-rohan-v1',
+      name: 'Horns of Rohan',
+      text: 'When you set this scheme in motion, creatures you control get +2/+1 until end of turn.',
+      type: 'oneshot', qty: 1, art: '<svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg"><defs><filter id="sunblur" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="18"/></filter><filter id="raysoft" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="2.5"/></filter><radialGradient id="dawn" cx="72%" cy="42%" r="65%"><stop offset="0%" stop-color="#ffcf7a"/><stop offset="35%" stop-color="#a8501c"/><stop offset="100%" stop-color="#0c0602"/></radialGradient><linearGradient id="hornshade" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#3a2408"/><stop offset="100%" stop-color="#0a0603"/></linearGradient></defs><rect width="400" height="200" fill="url(#dawn)"/><circle cx="285" cy="80" r="46" fill="#ffe8b8" filter="url(#sunblur)" opacity="0.8"/><g stroke="#ffcf7a" stroke-width="2" opacity="0.4" filter="url(#raysoft)"><line x1="285" y1="80" x2="285" y2="10"/><line x1="285" y1="80" x2="350" y2="40"/><line x1="285" y1="80" x2="360" y2="90"/><line x1="285" y1="80" x2="330" y2="140"/></g><path d="M110,165 Q140,90 235,68 Q270,64 264,88 Q205,90 178,138 Q162,168 132,172 Q104,175 110,165 Z" fill="url(#hornshade)"/><path d="M264,88 Q206,90 179,137" stroke="#ffcf7a" stroke-width="2" fill="none" opacity="0.6" filter="url(#raysoft)"/></svg>'
+    },
+    {
+      seedId: 'seed-ents-march-v1',
+      name: 'The Ents March',
+      text: 'When you set this scheme in motion, create two 3/4 green Treefolk creature tokens with reach.',
+      type: 'oneshot', qty: 1, art: '<svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg"><defs><filter id="mist" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="12"/></filter><filter id="rim" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="2.5"/></filter><linearGradient id="bg2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1c2c14"/><stop offset="60%" stop-color="#0c1408"/><stop offset="100%" stop-color="#030502"/></linearGradient><linearGradient id="trunkshade" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#080c05"/><stop offset="70%" stop-color="#141c0c"/><stop offset="100%" stop-color="#8fbf6e"/></linearGradient></defs><rect width="400" height="200" fill="url(#bg2)"/><g opacity="0.35" filter="url(#mist)"><path d="M310,200 C300,140 315,95 335,95 C355,95 365,140 350,200 Z" fill="#1c2810"/><path d="M100,200 C92,150 105,115 120,115 C135,115 145,150 135,200 Z" fill="#141e0c"/></g><path d="M235,200 L215,140 Q180,130 165,95 Q158,78 172,80 Q178,100 205,112 Q195,80 205,50 Q212,32 222,40 Q216,70 232,95 Q245,60 268,52 Q282,48 278,64 Q255,72 244,100 Q272,95 292,112 Q302,120 292,128 Q265,112 238,120 Q255,150 250,200 Z" fill="url(#trunkshade)"/><path d="M172,80 Q178,100 205,112 Q195,80 205,50" stroke="#8fbf6e" stroke-width="2" fill="none" opacity="0.55" filter="url(#rim)"/><path d="M268,52 Q282,48 278,64 Q255,72 244,100" stroke="#8fbf6e" stroke-width="2" fill="none" opacity="0.55" filter="url(#rim)"/><g opacity="0.5" stroke="#050803" stroke-width="2.5" fill="none"><path d="M225,160 Q218,150 224,135"/><path d="M238,175 Q246,163 240,148"/></g></svg>'
+    },
+    {
+      seedId: 'seed-oaths-of-the-grey-company-v1',
+      name: 'Oaths of the Grey Company',
+      text: 'When you set this scheme in motion, return target creature card from a graveyard to the battlefield under your control.',
+      type: 'oneshot', qty: 1, art: '<svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg"><defs><filter id="og1" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="9"/></filter><filter id="og2" x="-200%" y="-200%" width="500%" height="500%"><feGaussianBlur stdDeviation="3"/></filter><radialGradient id="ogbg" cx="50%" cy="35%" r="85%"><stop offset="0%" stop-color="#152820"/><stop offset="100%" stop-color="#030604"/></radialGradient></defs><rect width="400" height="200" fill="url(#ogbg)"/><ellipse cx="200" cy="185" rx="110" ry="16" fill="#0a1410" filter="url(#og1)"/><ellipse cx="200" cy="180" rx="90" ry="10" fill="#3a5a48" opacity="0.4" filter="url(#og1)"/><path d="M200,55 C222,55 232,85 225,112 C234,135 228,162 216,178 L184,178 C172,162 166,135 175,112 C168,85 178,55 200,55 Z" fill="#a8d9c0" opacity="0.3" filter="url(#og1)"/><circle cx="200" cy="85" r="4" fill="#c8f5d4" opacity="0.55" filter="url(#og2)"/></svg>'
+    },
+    {
+      seedId: 'seed-banners-of-gondor-v1',
+      name: 'Banners of Gondor',
+      text: 'When you set this scheme in motion, creatures you control get +1/+1 until end of turn for each creature you control.',
+      type: 'oneshot', qty: 1, art: '<svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg"><defs><filter id="bg1" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="8"/></filter><filter id="bg2" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="10"/></filter><radialGradient id="bgbg" cx="60%" cy="45%" r="75%"><stop offset="0%" stop-color="#2a3550"/><stop offset="100%" stop-color="#04050a"/></radialGradient></defs><rect width="400" height="200" fill="url(#bgbg)"/><circle cx="260" cy="90" r="45" fill="#8892c0" opacity="0.35" filter="url(#bg2)"/><line x1="180" y1="30" x2="180" y2="185" stroke="#2a2e3c" stroke-width="5"/><path d="M180,42 Q260,55 240,75 Q270,90 245,105 Q275,122 250,140 Q265,155 180,150 Z" fill="#12141c" filter="url(#bg1)"/></svg>'
+    },
+    {
+      seedId: 'seed-eagles-are-coming-v1',
+      name: 'The Eagles Are Coming',
+      text: 'When you set this scheme in motion, create two 3/3 blue Bird creature tokens with flying.',
+      type: 'oneshot', qty: 1, art: '<svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg"><defs><filter id="ea1" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="20"/></filter><filter id="ea2" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="1.2"/></filter><linearGradient id="eabg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#2a3860"/><stop offset="60%" stop-color="#1c2035"/><stop offset="100%" stop-color="#3a2412"/></linearGradient><linearGradient id="eaglegrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#8a6a35"/><stop offset="100%" stop-color="#100c05"/></linearGradient></defs><rect width="400" height="200" fill="url(#eabg)"/><circle cx="200" cy="105" r="60" fill="#ffe29a" opacity="0.5" filter="url(#ea1)"/><path d="M200,110 C185,95 150,80 90,83 C120,90 145,100 160,112 C130,110 90,107 55,117 C95,120 135,130 165,125 C145,132 110,142 85,157 C120,150 155,137 178,127 L200,134 L222,127 C245,137 280,150 315,157 C290,142 255,132 235,125 C265,130 305,120 345,117 C310,107 270,110 240,112 C255,100 280,90 310,83 C250,80 215,95 200,110 Z" fill="url(#eaglegrad)" filter="url(#ea2)"/><ellipse cx="200" cy="112" rx="9" ry="7" fill="#e8c583" opacity="0.8"/></svg>'
+    },
+    {
+      seedId: 'seed-uruk-hai-reinforcements-v1',
+      name: 'Uruk-hai Reinforcements',
+      text: 'When you set this scheme in motion, create four 1/1 black Orc creature tokens.',
+      type: 'oneshot', qty: 1, art: '<svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg"><defs><filter id="ur1" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="14"/></filter><filter id="ur2" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="1.5"/></filter><radialGradient id="urbg" cx="50%" cy="80%" r="90%"><stop offset="0%" stop-color="#4a1408"/><stop offset="100%" stop-color="#040201"/></radialGradient></defs><rect width="400" height="200" fill="url(#urbg)"/><ellipse cx="200" cy="170" rx="180" ry="40" fill="#e8641c" opacity="0.28" filter="url(#ur1)"/><g stroke="#0a0705" stroke-width="6" filter="url(#ur2)"><line x1="100" y1="200" x2="90" y2="60"/><line x1="150" y1="200" x2="145" y2="40"/><line x1="200" y1="200" x2="200" y2="30"/><line x1="250" y1="200" x2="255" y2="45"/><line x1="300" y1="200" x2="310" y2="65"/></g><g fill="#3a3a3e"><polygon points="90,60 100,75 80,75"/><polygon points="145,40 156,58 134,58"/><polygon points="200,30 212,50 188,50"/><polygon points="255,45 266,63 244,63"/><polygon points="310,65 320,80 300,80"/></g></svg>'
+    },
+    {
+      seedId: 'seed-one-ring-to-rule-them-all-v1',
+      name: 'One Ring to Rule Them All',
+      text: 'When you set this scheme in motion, put The One Ring onto the battlefield under your control.',
+      type: 'oneshot', qty: 1, special: 'one-ring',
+      art: '<svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice"><defs><radialGradient id="ringglow" cx="50%" cy="50%" r="65%"><stop offset="0%" stop-color="#3a1a05"/><stop offset="100%" stop-color="#0a0603"/></radialGradient><linearGradient id="ringmetal" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#ffe29a"/><stop offset="50%" stop-color="#D8AE66"/><stop offset="100%" stop-color="#8a5a1e"/></linearGradient></defs><rect width="400" height="200" fill="url(#ringglow)"/><path d="M110,55 Q130,35 150,55 T190,55" stroke="#ffb35c" stroke-width="1.5" fill="none" opacity="0.5"/><path d="M250,145 Q270,165 290,145 T330,145" stroke="#ffb35c" stroke-width="1.5" fill="none" opacity="0.45"/><path d="M70,150 Q85,130 100,150" stroke="#ffb35c" stroke-width="1.2" fill="none" opacity="0.35"/><path d="M300,60 Q315,45 330,60" stroke="#ffb35c" stroke-width="1.2" fill="none" opacity="0.35"/><circle cx="200" cy="100" r="55" fill="none" stroke="url(#ringmetal)" stroke-width="16"/><circle cx="200" cy="100" r="55" fill="none" stroke="#000" stroke-width="16" opacity="0.12"/><ellipse cx="182" cy="78" rx="16" ry="7" fill="#fff3d0" opacity="0.4" transform="rotate(-30 182 78)"/></svg>'
+    },
+    {
+      seedId: 'seed-roads-go-ever-on-v1',
+      name: 'Roads Go Ever On',
+      text: 'When you set this scheme in motion, search your library for up to two basic land cards, put them onto the battlefield tapped, then shuffle.',
+      type: 'oneshot', qty: 1, art: '<svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg"><defs><filter id="rd1" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="16"/></filter><filter id="rd2" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="5"/></filter><linearGradient id="rdbg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#4a3010"/><stop offset="55%" stop-color="#1c1408"/><stop offset="100%" stop-color="#050301"/></linearGradient></defs><rect width="400" height="200" fill="url(#rdbg)"/><circle cx="200" cy="72" r="30" fill="#ffcf7a" opacity="0.55" filter="url(#rd1)"/><polygon points="150,200 250,200 210,75 190,75" fill="#0c0805" filter="url(#rd2)"/><polygon points="150,200 250,200 210,75 190,75" fill="none" stroke="#c9a05a" stroke-width="1" opacity="0.3"/></svg>'
+    },
+    {
+      seedId: 'seed-dwarven-prospectors-v1',
+      name: 'Dwarven Prospectors',
+      text: 'When you set this scheme in motion, create four Treasure tokens.\n(Treasure tokens are artifacts with "{T}, Sacrifice this artifact: Add one mana of any color.")',
+      type: 'oneshot', qty: 1, art: '<svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg"><defs><filter id="dp1" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="12"/></filter><filter id="dp2" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="4"/></filter><radialGradient id="dpbg" cx="50%" cy="50%" r="80%"><stop offset="0%" stop-color="#241a0a"/><stop offset="100%" stop-color="#030201"/></radialGradient></defs><rect width="400" height="200" fill="url(#dpbg)"/><path d="M40,60 L160,40 L220,90 L340,55 L370,140 L260,175 L180,130 L60,160 Z" fill="#100c08"/><path d="M80,110 Q140,90 170,110 Q210,95 250,115 Q290,100 320,120" stroke="#ffcf7a" stroke-width="4" fill="none" opacity="0.7" filter="url(#dp2)"/><circle cx="170" cy="110" r="18" fill="#ffe29a" opacity="0.5" filter="url(#dp1)"/><circle cx="270" cy="112" r="14" fill="#ffcf7a" opacity="0.45" filter="url(#dp1)"/></svg>'
+    },
+    {
+      seedId: 'seed-bargain-with-the-dwarves-v1',
+      name: 'Bargain with the Dwarves',
+      text: 'When you set this scheme in motion, spells you cast cost {2} less to cast this turn.',
+      type: 'oneshot', qty: 1, art: '<svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg"><defs><filter id="bd1" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="18"/></filter><filter id="bd2" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="1"/></filter><radialGradient id="bdbg" cx="50%" cy="50%" r="75%"><stop offset="0%" stop-color="#2e2008"/><stop offset="100%" stop-color="#040301"/></radialGradient></defs><rect width="400" height="200" fill="url(#bdbg)"/><circle cx="200" cy="100" r="55" fill="#ffcf7a" opacity="0.45" filter="url(#bd1)"/><polygon points="200,55 235,95 200,150 165,95" fill="#ffe9b0" stroke="#8a5a1e" stroke-width="1" filter="url(#bd2)"/><polygon points="200,55 235,95 200,110 165,95" fill="#fff8e0" opacity="0.5"/></svg>'
+    },
+    {
+      seedId: 'seed-shires-bounty-v1',
+      name: 'The Shire\'s Bounty',
+      text: 'When you set this scheme in motion, search your library for a land card, put it onto the battlefield, then shuffle.',
+      type: 'oneshot', qty: 1, art: '<svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg"><defs><filter id="sb1" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="8"/></filter><filter id="sb2" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="6"/></filter><linearGradient id="sbbg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#6b7a3e"/><stop offset="55%" stop-color="#2a3818"/><stop offset="100%" stop-color="#0a0e06"/></linearGradient></defs><rect width="400" height="200" fill="url(#sbbg)"/><path d="M0,140 Q100,105 200,130 Q300,155 400,120 L400,200 L0,200 Z" fill="#3d4d24" opacity="0.9" filter="url(#sb1)"/><path d="M0,165 Q120,145 240,160 Q320,172 400,150 L400,200 L0,200 Z" fill="#1c2410"/><circle cx="270" cy="152" r="10" fill="#ffcf7a" opacity="0.8" filter="url(#sb2)"/></svg>'
+    },
+    {
+      seedId: 'seed-roots-of-the-shire-v1',
+      name: 'Roots of the Shire',
+      text: 'When you set this scheme in motion, search your library for a basic land card, put it onto the battlefield, then shuffle.',
+      type: 'oneshot', qty: 1, firstTurnOnly: true,
+      art: '<svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg"><defs><filter id="rt1" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="9"/></filter><filter id="rt2" x="-200%" y="-200%" width="500%" height="500%"><feGaussianBlur stdDeviation="3"/></filter><linearGradient id="rtsky" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#2a3818"/><stop offset="100%" stop-color="#0e1408"/></linearGradient><linearGradient id="rtsoil" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#241a0e"/><stop offset="100%" stop-color="#030201"/></linearGradient></defs><rect width="400" height="100" fill="url(#rtsky)"/><rect y="100" width="400" height="100" fill="url(#rtsoil)"/><rect y="96" width="400" height="8" fill="#1c130a" opacity="0.8" filter="url(#rt1)"/><circle cx="198" cy="60" r="26" fill="#8fbf6e" opacity="0.35" filter="url(#rt1)"/><line x1="200" y1="100" x2="200" y2="52" stroke="#6b8f52" stroke-width="4" stroke-linecap="round"/><path d="M200,70 Q182,56 172,42" stroke="#7a9b5e" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M200,60 Q220,46 233,34" stroke="#7a9b5e" stroke-width="3" fill="none" stroke-linecap="round"/><ellipse cx="167" cy="38" rx="9" ry="5.5" fill="#8fbf6e" transform="rotate(-30 167 38)" filter="url(#rt2)"/><ellipse cx="238" cy="30" rx="9" ry="5.5" fill="#8fbf6e" transform="rotate(25 238 30)" filter="url(#rt2)"/><g stroke="#c9a05a" stroke-width="2.2" fill="none" opacity="0.6" filter="url(#rt2)"><path d="M200,102 Q175,116 155,150"/><path d="M200,102 Q225,120 245,155"/><path d="M200,102 Q198,132 195,168"/></g></svg>'
+    },
+    {
+      seedId: 'seed-galadriels-gift-v1',
+      name: 'Galadriel\'s Gift',
+      text: 'When you set this scheme in motion, you may cast a spell with mana value 3 or less from your hand this turn without paying its mana cost.',
+      type: 'oneshot', qty: 1, firstTurnOnly: true,
+      art: '<svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg"><defs><filter id="gg1" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="18"/></filter><filter id="gg2" x="-200%" y="-200%" width="500%" height="500%"><feGaussianBlur stdDeviation="3"/></filter><filter id="gg3" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="2"/></filter><radialGradient id="ggbg" cx="50%" cy="45%" r="80%"><stop offset="0%" stop-color="#1c2440"/><stop offset="100%" stop-color="#04050c"/></radialGradient><radialGradient id="ggglow" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#eaf2ff"/><stop offset="60%" stop-color="#a8c8ff"/><stop offset="100%" stop-color="#5a7ac0"/></radialGradient><linearGradient id="ggglass" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#dfe8ff" stop-opacity="0.15"/><stop offset="50%" stop-color="#ffffff" stop-opacity="0.35"/><stop offset="100%" stop-color="#dfe8ff" stop-opacity="0.15"/></linearGradient></defs><rect width="400" height="200" fill="url(#ggbg)"/><circle cx="200" cy="115" r="70" fill="url(#ggglow)" opacity="0.55" filter="url(#gg1)"/><!-- phial body --><path d="M188,80 L212,80 L212,100 Q232,120 228,150 Q224,178 200,180 Q176,178 172,150 Q168,120 188,100 Z" fill="url(#ggglow)" opacity="0.9"/><path d="M188,80 L212,80 L212,100 Q232,120 228,150 Q224,178 200,180 Q176,178 172,150 Q168,120 188,100 Z" fill="url(#ggglass)"/><path d="M188,80 L212,80 L212,100 Q232,120 228,150 Q224,178 200,180 Q176,178 172,150 Q168,120 188,100 Z" fill="none" stroke="#eaf2ff" stroke-width="1.5" opacity="0.6"/><!-- neck and stopper --><rect x="191" y="62" width="18" height="20" rx="3" fill="#cfe0ff" opacity="0.8"/><ellipse cx="200" cy="60" rx="12" ry="5" fill="#eaf2ff" opacity="0.85"/><!-- swirl of light inside --><path d="M188,150 Q198,130 195,115 Q192,100 205,95" stroke="#ffffff" stroke-width="2" fill="none" opacity="0.6" filter="url(#gg3)"/><!-- star motes drifting up and out --><g fill="#eaf2ff" filter="url(#gg2)"><circle cx="150" cy="70" r="2.4" opacity="0.8"/><circle cx="255" cy="60" r="2" opacity="0.7"/><circle cx="130" cy="110" r="1.6" opacity="0.6"/><circle cx="270" cy="105" r="1.8" opacity="0.6"/><circle cx="165" cy="45" r="1.4" opacity="0.55"/><circle cx="235" cy="40" r="1.5" opacity="0.55"/><circle cx="200" cy="35" r="1.8" opacity="0.65"/></g></svg>'
     }
   ];
 
@@ -253,24 +417,81 @@
     try { game = gameRes ? JSON.parse(gameRes.value) : defaultGame(); }
     catch (e) { game = defaultGame(); }
     if (!game || typeof game !== 'object' || !Array.isArray(game.deck) || !Array.isArray(game.ongoing) || !Array.isArray(game.history)) game = defaultGame();
+    if (typeof game.started !== 'boolean'){
+      game.started = (game.turn > 1) || game.history.length > 0 || game.ongoing.length > 0 || !!game.lastDrawn;
+    }
+    if (!game.turn || game.turn < 1) game.turn = 1;
 
     if (!library.seededIds) library.seededIds = [];
     var seededChanged = false;
+
+    if (!library.onboardingRemoved){
+      var beforeCount = library.cards.length;
+      library.cards = library.cards.filter(function(c){
+        return c.seedId || (c.name !== 'The Watcher Stirs' && c.name !== 'A Shadow Lingers');
+      });
+      library.onboardingRemoved = true;
+      if (library.cards.length !== beforeCount) seededChanged = true;
+    }
+
+    // Migrate cards seeded before seedId/seedLocked tracking existed: link them by exact name match
     SEED_CARDS.forEach(function(seed){
-      if (library.seededIds.indexOf(seed.seedId) === -1){
-        library.cards.push({ id: uid(), name: seed.name, text: seed.text, type: seed.type, qty: seed.qty, art: seed.art || null });
+      if (library.seededIds.indexOf(seed.seedId) === -1) return;
+      var alreadyLinked = false;
+      for (var i = 0; i < library.cards.length; i++){ if (library.cards[i].seedId === seed.seedId){ alreadyLinked = true; break; } }
+      if (alreadyLinked) return;
+      for (var j = 0; j < library.cards.length; j++){
+        if (!library.cards[j].seedId && library.cards[j].name === seed.name){
+          library.cards[j].seedId = seed.seedId;
+          library.cards[j].seedLocked = false;
+          seededChanged = true;
+          break;
+        }
+      }
+    });
+
+    // Inject new seeds, and sync unlocked existing seeded cards to the latest definition
+    SEED_CARDS.forEach(function(seed){
+      var existing = null;
+      for (var i = 0; i < library.cards.length; i++){ if (library.cards[i].seedId === seed.seedId){ existing = library.cards[i]; break; } }
+      if (existing){
+        if (!existing.seedLocked){
+          var newArt = seed.art || null, newSpecial = seed.special || null, newFirst = !!seed.firstTurnOnly;
+          if (existing.name !== seed.name || existing.text !== seed.text || existing.type !== seed.type || existing.qty !== seed.qty || existing.art !== newArt || existing.firstTurnOnly !== newFirst || existing.special !== newSpecial){
+            existing.name = seed.name; existing.text = seed.text; existing.type = seed.type; existing.qty = seed.qty;
+            existing.art = newArt; existing.firstTurnOnly = newFirst; existing.special = newSpecial;
+            seededChanged = true;
+          }
+        }
+      } else if (library.seededIds.indexOf(seed.seedId) === -1){
+        library.cards.push({ id: uid(), seedId: seed.seedId, name: seed.name, text: seed.text, type: seed.type, qty: seed.qty, art: seed.art || null, firstTurnOnly: !!seed.firstTurnOnly, special: seed.special || null, seedLocked: false });
         library.seededIds.push(seed.seedId);
         seededChanged = true;
       }
     });
     if (seededChanged) saveLibrary();
 
+    var starterMigrated = false;
+    if (!Array.isArray(game.starterDeck)){
+      game.starterDeck = [];
+      var firstTurnCardIds = {};
+      library.cards.forEach(function(c){ if (c.firstTurnOnly) firstTurnCardIds[c.id] = true; });
+      var starterDeck = game.starterDeck, remaining = [];
+      game.deck.forEach(function(inst){
+        if (firstTurnCardIds[inst.cardId]){ starterDeck.push(inst); starterMigrated = true; } else remaining.push(inst);
+      });
+      game.deck = remaining;
+    }
+
     var ids = {};
     library.cards.forEach(function(c){ ids[c.id] = true; });
+    var deckBefore = game.deck.length, ongoingBefore = game.ongoing.length, starterBefore = game.starterDeck.length;
     game.deck = (game.deck || []).filter(function(i){ return ids[i.cardId]; });
     game.ongoing = (game.ongoing || []).filter(function(i){ return ids[i.cardId]; });
+    game.starterDeck = (game.starterDeck || []).filter(function(i){ return ids[i.cardId]; });
+    if (starterMigrated || game.deck.length !== deckBefore || game.ongoing.length !== ongoingBefore || game.starterDeck.length !== starterBefore) saveGame();
 
-    if (game.deck.length === 0 && game.ongoing.length === 0 && library.cards.length > 0){
+    if (game.deck.length === 0 && game.starterDeck.length === 0 && game.ongoing.length === 0 && library.cards.length > 0){
       rebuildDeck(false, false);
     }
     render();
@@ -280,27 +501,32 @@
     try {
       var ok = await storageSet(LIB_KEY, JSON.stringify(library));
       storageError = !ok;
-    } catch (e) { storageError = true; console.error('Scheme Keeper: save library failed', e); }
+    } catch (e) { storageError = true; console.error('Arbeider Archenemy: save library failed', e); }
   }
   async function saveGame(){
     try {
       var ok = await storageSet(GAME_KEY, JSON.stringify(game));
       storageError = !ok;
-    } catch (e) { storageError = true; console.error('Scheme Keeper: save game failed', e); }
+    } catch (e) { storageError = true; console.error('Arbeider Archenemy: save game failed', e); }
   }
 
   function rebuildDeck(resetTurn, doRender){
-    var instances = [];
+    var firstInstances = [];
+    var normalInstances = [];
     library.cards.forEach(function(c){
       var qty = Math.max(1, c.qty || 1);
-      for (var i = 0; i < qty; i++){ instances.push({ id: uid(), cardId: c.id }); }
+      for (var i = 0; i < qty; i++){
+        var inst = { id: uid(), cardId: c.id };
+        if (c.firstTurnOnly) firstInstances.push(inst); else normalInstances.push(inst);
+      }
     });
-    game.deck = shuffle(instances);
+    game.starterDeck = shuffle(firstInstances);
+    game.deck = shuffle(normalInstances);
     game.ongoing = [];
     game.drawnThisTurn = false;
     game.lastDrawn = null;
     game.history = [];
-    if (resetTurn) game.turn = 0;
+    if (resetTurn) game.turn = 1;
     saveGame();
     if (doRender !== false) render();
   }
@@ -316,26 +542,31 @@
     return rem === 0 ? game.turn : game.turn + (interval - rem);
   }
 
+  function activeDrawPool(){
+    return (game.turn === 1 && game.starterDeck.length > 0) ? game.starterDeck : game.deck;
+  }
+
   function nextTurn(){ game.turn += 1; game.drawnThisTurn = false; saveGame(); render(); }
   function prevTurn(){ if (game.turn > 0){ game.turn -= 1; game.drawnThisTurn = false; saveGame(); render(); } }
 
   function drawScheme(){
-    if (game.drawnThisTurn || !isEligible() || game.deck.length === 0) return;
-    var drawn = game.deck.shift();
+    var pool = activeDrawPool();
+    if (game.drawnThisTurn || !isEligible() || pool.length === 0) return;
+    var drawn = pool.shift();
     var card = null;
     for (var i = 0; i < library.cards.length; i++){ if (library.cards[i].id === drawn.cardId){ card = library.cards[i]; break; } }
     if (!card){ saveGame(); render(); return; }
     game.drawnThisTurn = true;
-    game.lastDrawn = { instanceId: drawn.id, cardId: card.id, name: card.name, text: card.text, type: card.type, art: card.art || null };
+    game.lastDrawn = { instanceId: drawn.id, cardId: card.id, name: card.name, text: card.text, type: card.type, art: card.art || null, special: card.special || null };
     game.history.unshift({ turn: game.turn, name: card.name, type: card.type });
     if (card.type === 'ongoing'){ game.ongoing.push(drawn); }
-    else { game.deck.push(drawn); }
+    else if (!card.firstTurnOnly){ game.deck.push(drawn); }
     justDrawnAnimation = true;
     saveGame();
     render();
   }
 
-  function dismissLastDrawn(){ game.lastDrawn = null; saveGame(); render(); }
+  function dismissLastDrawn(){ game.lastDrawn = null; nextTurn(); }
 
   function abandonOngoing(instanceId){
     var idx = -1;
@@ -354,6 +585,7 @@
     pendingNewGame = false;
     showBackup = false;
     bulkMode = false;
+    showGameMenu = false;
     render();
   }
 
@@ -362,9 +594,9 @@
       var found = null;
       for (var i = 0; i < library.cards.length; i++){ if (library.cards[i].id === id){ found = library.cards[i]; break; } }
       if (!found) return;
-      cardForm = { id: found.id, name: found.name, text: found.text, type: found.type, qty: found.qty, art: found.art || null };
+      cardForm = { id: found.id, name: found.name, text: found.text, type: found.type, qty: found.qty, art: found.art || null, firstTurnOnly: !!found.firstTurnOnly };
     } else {
-      cardForm = { id: null, name: '', text: '', type: 'oneshot', qty: 1, art: null };
+      cardForm = { id: null, name: '', text: '', type: 'oneshot', qty: 1, art: null, firstTurnOnly: false };
     }
     pendingDeleteId = null;
     render();
@@ -381,6 +613,7 @@
     if (q) cardForm.qty = Math.max(1, parseInt(q.value, 10) || 1);
   }
   function setFormType(type){ syncFormFromDOM(); cardForm.type = type; render(); }
+  function toggleFirstTurnOnly(){ syncFormFromDOM(); cardForm.firstTurnOnly = !cardForm.firstTurnOnly; render(); }
 
   function saveCardForm(){
     syncFormFromDOM();
@@ -394,11 +627,13 @@
           library.cards[i].type = cardForm.type;
           library.cards[i].qty = cardForm.qty;
           library.cards[i].art = cardForm.art || null;
+          library.cards[i].firstTurnOnly = !!cardForm.firstTurnOnly;
+          library.cards[i].seedLocked = true;
           break;
         }
       }
     } else {
-      library.cards.push({ id: uid(), name: name, text: cardForm.text || '', type: cardForm.type, qty: cardForm.qty, art: cardForm.art || null });
+      library.cards.push({ id: uid(), name: name, text: cardForm.text || '', type: cardForm.type, qty: cardForm.qty, art: cardForm.art || null, firstTurnOnly: !!cardForm.firstTurnOnly });
     }
     saveLibrary();
     cardForm = null;
@@ -429,7 +664,10 @@
 
   function exportCardsAsText(){
     return library.cards.map(function(c){
-      return 'Name: ' + c.name + '\nType: ' + (c.type === 'ongoing' ? 'ongoing' : 'oneshot') + '\nQty: ' + (c.qty || 1) + '\nText: ' + (c.text || '');
+      var lines = ['Name: ' + c.name, 'Type: ' + (c.type === 'ongoing' ? 'ongoing' : 'oneshot'), 'Qty: ' + (c.qty || 1)];
+      if (c.firstTurnOnly) lines.push('First turn only: yes');
+      lines.push('Text: ' + (c.text || ''));
+      return lines.join('\n');
     }).join('\n---\n');
   }
 
@@ -442,22 +680,24 @@
     });
     var cards = [];
     blocks.forEach(function(blockLines){
-      var name = '', type = 'oneshot', qty = 1, textLines = null;
+      var name = '', type = 'oneshot', qty = 1, firstTurnOnly = false, textLines = null;
       for (var i = 0; i < blockLines.length; i++){
         var line = blockLines[i];
         if (textLines !== null){ textLines.push(line); continue; }
         var mName = /^\s*Name\s*:\s*(.*)$/i.exec(line);
         var mType = /^\s*Type\s*:\s*(.*)$/i.exec(line);
         var mQty = /^\s*Qty\s*:\s*(.*)$/i.exec(line);
+        var mFirst = /^\s*First turn only\s*:\s*(.*)$/i.exec(line);
         var mText = /^\s*Text\s*:\s*(.*)$/i.exec(line);
         if (mName){ name = mName[1].trim(); }
         else if (mType){ type = /ongoing/i.test(mType[1]) ? 'ongoing' : 'oneshot'; }
         else if (mQty){ qty = Math.max(1, parseInt(mQty[1], 10) || 1); }
+        else if (mFirst){ firstTurnOnly = /^(yes|true|1)$/i.test(mFirst[1].trim()); }
         else if (mText){ textLines = [mText[1]]; }
       }
       var cardText = textLines ? textLines.join('\n').trim() : '';
       name = name.trim();
-      if (name){ cards.push({ name: name, type: type, qty: qty, text: cardText }); }
+      if (name){ cards.push({ name: name, type: type, qty: qty, firstTurnOnly: firstTurnOnly, text: cardText }); }
     });
     return cards;
   }
@@ -474,7 +714,7 @@
     library.cards.forEach(function(c){ existingByName[(c.name || '').trim().toLowerCase()] = c; });
     library.cards = parsed.map(function(p){
       var match = existingByName[p.name.toLowerCase()];
-      return { id: match ? match.id : uid(), name: p.name, type: p.type, qty: p.qty, text: p.text, art: match ? (match.art || null) : null };
+      return { id: match ? match.id : uid(), name: p.name, type: p.type, qty: p.qty, firstTurnOnly: !!p.firstTurnOnly, text: p.text, art: match ? (match.art || null) : null, special: match ? (match.special || null) : null, seedId: match ? (match.seedId || null) : null, seedLocked: !!match };
     });
     var ids = {};
     library.cards.forEach(function(c){ ids[c.id] = true; });
@@ -495,11 +735,37 @@
     render();
   }
 
+  function startGame(){
+    rebuildDeck(true, false);
+    game.started = true;
+    saveGame();
+    render();
+  }
+
   function confirmNewGame(){
-    if (pendingNewGame){ rebuildDeck(true, false); pendingNewGame = false; render(); }
-    else { pendingNewGame = true; render(); }
+    if (pendingNewGame){
+      rebuildDeck(true, false);
+      game.started = true;
+      saveGame();
+      pendingNewGame = false;
+      showGameMenu = false;
+      render();
+    } else {
+      pendingNewGame = true;
+      render();
+    }
   }
   function reshuffleNow(){ rebuildDeck(false, false); render(); }
+
+  function toggleGameMenu(){ showGameMenu = !showGameMenu; pendingNewGame = false; render(); }
+  function goToMainMenu(){
+    game.started = false;
+    showGameMenu = false;
+    pendingNewGame = false;
+    activeTab = 'table';
+    saveGame();
+    render();
+  }
 
   function toggleBackup(){ showBackup = !showBackup; render(); }
   function copyBackup(){
@@ -521,27 +787,35 @@
     }
   }
 
-  function sealMarkup(){
-    return '<circle cx="50" cy="50" r="46" fill="none" stroke="#A9803E" stroke-width="2.5"/>' +
-      '<circle cx="50" cy="50" r="34" fill="none" stroke="#D8AE66" stroke-width="1.5"/>' +
-      '<circle cx="50" cy="50" r="6" fill="#D8AE66"/>' +
-      '<g stroke="#A9803E" stroke-width="2" stroke-linecap="round">' +
-      '<line x1="50" y1="16" x2="50" y2="4"/><line x1="50" y1="84" x2="50" y2="96"/>' +
-      '<line x1="16" y1="50" x2="4" y2="50"/><line x1="84" y1="50" x2="96" y2="50"/>' +
-      '<line x1="27" y1="27" x2="19" y2="19"/><line x1="73" y1="73" x2="81" y2="81"/>' +
-      '<line x1="73" y1="27" x2="81" y2="19"/><line x1="27" y1="73" x2="19" y2="81"/>' +
-      '</g>';
+  function birdMarkup(){
+    return '<defs><linearGradient id="birdBodyGrad" x1="0" y1="0" x2="1" y2="1">' +
+      '<stop offset="0%" stop-color="#D8AE66"/><stop offset="100%" stop-color="#A9803E"/></linearGradient></defs>' +
+      '<polygon points="44,58 22,48 4,32 8,46 18,58 34,66 45,66" fill="#7a5f30" stroke="#4a3818" stroke-width="1"/>' +
+      '<polygon points="43,64 24,60 10,54 16,64 28,71 42,70" fill="#93753d" stroke="#4a3818" stroke-width="1"/>' +
+      '<line x1="30" y1="52" x2="10" y2="38" stroke="#4a3818" stroke-width="1" opacity="0.55"/>' +
+      '<line x1="28" y1="61" x2="14" y2="53" stroke="#4a3818" stroke-width="1" opacity="0.5"/>' +
+      '<polygon points="68,26 82,27 93,35 99,48 97,61 88,73 73,80 57,79 46,72 40,60 41,47 48,35 58,28" fill="url(#birdBodyGrad)" stroke="#4a3818" stroke-width="1.2"/>' +
+      '<polygon points="58,28 68,26 63,42" fill="#e8c583" opacity="0.55"/>' +
+      '<polygon points="48,35 41,47 56,46" fill="#e8c583" opacity="0.35"/>' +
+      '<polygon points="46,72 57,79 60,58" fill="#e8c583" opacity="0.4"/>' +
+      '<polygon points="88,73 73,80 76,58" fill="#7a5a28" opacity="0.45"/>' +
+      '<polygon points="93,35 99,48 82,44" fill="#7a5a28" opacity="0.35"/>' +
+      '<polygon points="40,60 41,47 50,55" fill="#7a5a28" opacity="0.35"/>' +
+      '<polygon points="94,40 106,44 93,50" fill="#3d2f1a" stroke="#241a0d" stroke-width="0.6"/>' +
+      '<circle cx="81" cy="36" r="2.3" fill="#1a1610"/>' +
+      '<circle cx="80" cy="35" r="0.7" fill="#D8AE66" opacity="0.7"/>';
   }
-  function sealSVG(size){
-    return '<svg viewBox="0 0 100 100" width="' + size + '" height="' + size + '" xmlns="http://www.w3.org/2000/svg">' + sealMarkup() + '</svg>';
+  function birdSVG(size){
+    var h = Math.round(size * 100 / 115);
+    return '<svg viewBox="0 0 115 100" width="' + size + '" height="' + h + '" xmlns="http://www.w3.org/2000/svg">' + birdMarkup() + '</svg>';
   }
   function defaultArtSVG(){
     return '<svg viewBox="0 0 400 200" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">' +
-      '<rect width="400" height="200" fill="#1c211f"/>' +
-      '<g opacity="0.45" stroke="#A9803E" stroke-width="1">' +
+      '<rect width="400" height="200" fill="#171d13"/>' +
+      '<g opacity="0.4" stroke="#A9803E" stroke-width="1">' +
       '<line x1="0" y1="50" x2="400" y2="50"/><line x1="0" y1="100" x2="400" y2="100"/><line x1="0" y1="150" x2="400" y2="150"/>' +
       '</g>' +
-      '<g transform="translate(140,40) scale(0.6)" opacity="0.55">' + sealMarkup() + '</g>' +
+      '<g transform="translate(140,50) scale(0.9)" opacity="0.5">' + birdMarkup() + '</g>' +
       '</svg>';
   }
   function renderArtBox(art, context){
@@ -584,10 +858,19 @@
   function removeArt(){ if (!cardForm) return; syncFormFromDOM(); cardForm.art = null; render(); }
 
   function renderHeader(){
-    return '<div class="topbar">' +
-      '<div class="seal-mini">' + sealSVG(38) + '</div>' +
-      '<div><div class="app-title">Scheme Keeper</div><div class="app-subtitle">homebrew archenemy tracker</div></div>' +
+    var gearBtn = (game && game.started) ? '<button class="gear-btn" onclick="App.toggleGameMenu()" aria-label="Game menu">⚙</button>' : '';
+    var html = '<div class="topbar">' +
+      '<div class="topbar-left"><div class="seal-mini">' + birdSVG(38) + '</div>' +
+      '<div><div class="app-title">Arbeider Archenemy</div><div class="app-subtitle">a scheme-keeper for Middle-earth game night</div></div></div>' +
+      gearBtn +
       '</div>';
+    if (showGameMenu && game && game.started){
+      html += '<div class="game-menu">';
+      html += '<button class="btn btn-danger" onclick="App.confirmNewGame()">' + (pendingNewGame ? 'Confirm restart?' : 'Restart') + '</button>';
+      html += '<button class="btn btn-ghost" onclick="App.goToMainMenu()">Return to main menu</button>';
+      html += '</div>';
+    }
+    return html;
   }
 
   function renderTabBar(){
@@ -595,42 +878,53 @@
     return '<div class="tabbar">' + tab('table', 'Table') + tab('cards', 'Cards') + tab('rules', 'Rules') + '</div>';
   }
 
-  function renderTable(){
-    var html = '';
-    html += '<div class="turn-panel">';
-    html += '<div class="turn-label">Archenemy turn</div>';
-    html += '<div class="turn-number">' + game.turn + '</div>';
-    html += '<div class="turn-controls">';
-    html += '<button class="btn btn-ghost" onclick="App.prevTurn()">−</button>';
-    html += '<button class="btn btn-primary" onclick="App.nextTurn()">Next turn →</button>';
+  function renderStartScreen(){
+    var html = '<div class="start-screen">';
+    html += birdSVG(64);
+    html += '<div class="start-title">Ready when you are</div>';
+    html += '<div class="start-sub">' + library.cards.length + ' scheme' + (library.cards.length === 1 ? '' : 's') + ' in your deck</div>';
+    if (library.cards.length === 0){
+      html += '<div class="empty-note">Add some schemes in the Cards tab first.</div>';
+    } else {
+      html += '<button class="btn btn-primary btn-block" onclick="App.startGame()">Start New Game</button>';
+    }
     html += '</div>';
+    return html;
+  }
+
+  function renderTable(){
+    if (!game.started){ return renderStartScreen(); }
+    var html = '';
     var eligible = isEligible();
-    if (eligible){ html += '<div class="eligibility lit">Eligible to draw a scheme</div>'; }
-    else { html += '<div class="eligibility unlit">Next eligible: turn ' + nextEligibleTurn() + '</div>'; }
+    html += '<div class="control-bar">';
+    html += '<div class="turn-mini"><button class="mini-btn" onclick="App.prevTurn()">−</button><span class="turn-mini-label">Turn <strong>' + game.turn + '</strong></span><button class="mini-btn" onclick="App.nextTurn()">+</button></div>';
+    html += '<div class="eligibility-mini ' + (eligible ? 'lit' : 'unlit') + '">' + (eligible ? '● Ready' : '○ Turn ' + nextEligibleTurn()) + '</div>';
     html += '</div>';
 
     if (library.cards.length === 0){
-      html += '<div class="empty-note">No schemes yet. Add some in the Cards tab before you start a game.</div>';
+      html += '<div class="empty-note">No schemes yet. Add some in the Cards tab.</div>';
     } else {
-      var disabled = !eligible || game.drawnThisTurn || game.deck.length === 0;
+      var pool = activeDrawPool();
+      var disabled = !eligible || game.drawnThisTurn || pool.length === 0;
       html += '<button class="draw-btn" ' + (disabled ? 'disabled' : '') + ' onclick="App.drawScheme()">Draw a Scheme</button>';
       var hint = '';
       if (!eligible) hint = 'Not eligible this turn.';
-      else if (game.drawnThisTurn) hint = 'Already drawn this turn — tap Next turn to continue.';
-      else if (game.deck.length === 0) hint = 'No schemes left in the deck. Abandon an ongoing scheme, or reshuffle in Rules.';
-      html += '<div class="draw-hint">' + hint + '</div>';
+      else if (game.drawnThisTurn) hint = 'Resolve the scheme above to continue.';
+      else if (pool.length === 0) hint = 'No schemes left. Abandon an ongoing scheme, or reshuffle in Rules.';
+      if (hint) html += '<div class="draw-hint">' + hint + '</div>';
 
       if (game.lastDrawn){
         var d = game.lastDrawn;
         var revealClass = '';
         if (justDrawnAnimation){ revealClass = 'reveal'; justDrawnAnimation = false; }
-        html += '<div class="scheme-card ' + revealClass + '">';
-        html += '<div class="scheme-card-name">' + esc(d.name) + '</div>';
+        var specialClass = d.special ? ' special-' + d.special : '';
+        html += '<div class="scheme-card ' + revealClass + specialClass + '">';
+        html += '<div class="scheme-card-name"><span class="scheme-card-name-text">' + esc(d.name) + '</span></div>';
         html += '<div class="scheme-card-art-wrap">' + renderArtBox(d.art, 'card') + '</div>';
-        html += '<div class="scheme-card-type">' + (d.type === 'ongoing' ? 'Ongoing Scheme' : 'One-shot Scheme') + '</div>';
+        html += '<div class="scheme-card-type ' + d.type + '">' + (d.type === 'ongoing' ? 'Scheme — Ongoing' : 'Scheme') + '</div>';
         html += '<div class="scheme-card-text">' + esc(d.text) + '</div>';
         html += '</div>';
-        html += '<div class="scheme-card-actions-row"><button class="btn btn-primary btn-block" onclick="App.dismissLastDrawn()">' + (d.type === 'ongoing' ? 'Set in play' : 'Resolved') + '</button></div>';
+        html += '<div class="scheme-card-actions-row"><button class="btn btn-primary btn-block" onclick="App.dismissLastDrawn()">' + (d.type === 'ongoing' ? 'Set in Play → Next Turn' : 'Resolved → Next Turn') + '</button></div>';
       }
 
       if (game.ongoing.length > 0){
@@ -646,12 +940,13 @@
       if (game.history.length > 0){
         html += '<details class="history"><summary>Scroll of deeds (' + game.history.length + ')</summary>';
         game.history.slice(0, 30).forEach(function(h){
-          html += '<div class="history-item">Turn ' + h.turn + ' — ' + esc(h.name) + ' (' + (h.type === 'ongoing' ? 'ongoing' : 'one-shot') + ')</div>';
+          html += '<div class="history-item">Turn ' + h.turn + ' — ' + esc(h.name) + (h.type === 'ongoing' ? ' (ongoing)' : '') + '</div>';
         });
         html += '</details>';
       }
 
-      html += '<div class="deck-footer">' + game.deck.length + ' in deck · ' + game.ongoing.length + ' in play</div>';
+      var deckCount = game.deck.length + (game.turn === 1 ? game.starterDeck.length : 0);
+      html += '<div class="deck-footer">' + deckCount + ' in deck · ' + game.ongoing.length + ' in play</div>';
     }
     return html;
   }
@@ -668,7 +963,7 @@
 
     if (bulkMode){
       html += '<div class="form-panel">';
-      html += '<div class="hint">One card per block. Keep the Name / Type / Qty / Text lines, and separate cards with a line of three dashes (---). Art is not shown here — saving matches cards by name to keep any art already attached.</div>';
+      html += '<div class="hint">One card per block: Name / Type / Qty / Text, separated by a line of three dashes (---). Add a line "First turn only: yes" to mark a card as guaranteed-first-draw. Art is not shown here — saving matches cards by name to keep any art already attached.</div>';
       html += '<textarea id="bulk-text">' + esc(exportCardsAsText()) + '</textarea>';
       html += '<div class="bulk-actions"><button class="btn btn-primary" onclick="App.saveBulkCards()">Save all</button><button class="btn btn-ghost" onclick="App.toggleBulk()">Cancel</button></div>';
       html += '</div>';
@@ -687,10 +982,12 @@
       html += '</div>';
       html += '<label>Effect text</label><textarea id="cf-text" placeholder="What happens when this scheme is set in motion?">' + esc(f.text) + '</textarea>';
       html += '<label>Type</label><div class="type-toggle">';
-      html += '<button class="' + (f.type === 'oneshot' ? 'active' : '') + '" onclick="App.setFormType(\'oneshot\')">One-shot</button>';
+      html += '<button class="' + (f.type === 'oneshot' ? 'active' : '') + '" onclick="App.setFormType(\'oneshot\')">Scheme</button>';
       html += '<button class="' + (f.type === 'ongoing' ? 'active' : '') + '" onclick="App.setFormType(\'ongoing\')">Ongoing</button>';
       html += '</div>';
       html += '<label>Copies in deck</label><input type="number" id="cf-qty" min="1" max="10" value="' + (f.qty || 1) + '">';
+      html += '<label>Special timing</label><div class="type-toggle"><button class="' + (f.firstTurnOnly ? 'active' : '') + '" onclick="App.toggleFirstTurnOnly()">First turn only</button></div>';
+      html += '<div class="hint">If on, this scheme is guaranteed to be the first one drawn each game, then set aside for the rest of that game instead of returning to the deck.</div>';
       html += '<div class="form-actions">';
       html += '<button class="btn btn-primary" onclick="App.saveCardForm()">Save</button>';
       if (f.id){ html += '<button class="btn btn-danger" onclick="App.deleteCardConfirm(\'' + f.id + '\')">' + (pendingDeleteId === f.id ? 'Confirm delete?' : 'Delete') + '</button>'; }
@@ -704,7 +1001,7 @@
       library.cards.forEach(function(c){
         html += '<div class="card-row" onclick="App.openCardForm(\'' + c.id + '\')">';
         html += renderArtBox(c.art, 'thumb');
-        html += '<div class="card-row-main"><span class="badge ' + c.type + '">' + (c.type === 'ongoing' ? 'Ongoing' : 'One-shot') + '</span><span class="card-row-name">' + esc(c.name) + '</span></div>';
+        html += '<div class="card-row-main"><div class="card-row-badges"><span class="badge ' + c.type + '">' + (c.type === 'ongoing' ? 'Ongoing' : 'Scheme') + '</span>' + (c.firstTurnOnly ? '<span class="badge first-turn">Turn 1</span>' : '') + (c.special ? '<span class="badge special">★ Special</span>' : '') + '</div><span class="card-row-name">' + esc(c.name) + '</span></div>';
         html += '<div class="card-row-qty">×' + (c.qty || 1) + '</div>';
         html += '</div>';
       });
@@ -726,8 +1023,7 @@
     html += '<div class="rules-section">';
     html += '<div class="section-label">Deck</div>';
     html += '<button class="btn btn-ghost" onclick="App.reshuffleNow()">Reshuffle deck</button>';
-    html += '<button class="btn btn-danger" onclick="App.confirmNewGame()">' + (pendingNewGame ? 'Confirm new game?' : 'Start new game') + '</button>';
-    html += '<div class="hint">Reshuffle keeps the turn count and just remixes the deck. Start new game resets the turn counter, deck, ongoing schemes and history.</div>';
+    html += '<div class="hint">Reshuffle keeps the turn count and just remixes the deck. To restart or end the current game, use the ⚙ menu at the top of the Table tab.</div>';
     html += '</div>';
 
     html += '<div class="rules-section">';
@@ -763,12 +1059,14 @@
     saveCardForm: saveCardForm, deleteCardConfirm: deleteCardConfirm, saveRules: saveRules,
     confirmNewGame: confirmNewGame, reshuffleNow: reshuffleNow, toggleBackup: toggleBackup,
     copyBackup: copyBackup, doImport: doImport, onArtFileSelected: onArtFileSelected, removeArt: removeArt,
-    toggleBulk: toggleBulk, saveBulkCards: saveBulkCards
+    toggleBulk: toggleBulk, saveBulkCards: saveBulkCards, startGame: startGame,
+    toggleFirstTurnOnly: toggleFirstTurnOnly,
+    toggleGameMenu: toggleGameMenu, goToMainMenu: goToMainMenu
   };
 
   var appStarted = false;
   loadAll().then(function(){ appStarted = true; }).catch(function(e){
-    console.error('Scheme Keeper: loadAll failed', e);
+    console.error('Arbeider Archenemy: loadAll failed', e);
     if (!library) library = defaultLibrary();
     if (!game) game = defaultGame();
     storageError = true;
@@ -777,7 +1075,7 @@
   });
   setTimeout(function(){
     if (!appStarted){
-      console.error('Scheme Keeper: load timed out, forcing a fallback render');
+      console.error('Arbeider Archenemy: load timed out, forcing a fallback render');
       if (!library) library = defaultLibrary();
       if (!game) game = defaultGame();
       storageError = true;
