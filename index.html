@@ -66,6 +66,22 @@
   .start-screen{text-align:center;padding:56px 16px 30px;}
   .start-title{font-family:var(--font-display);font-size:21px;color:var(--parchment-hi);margin:16px 0 6px;}
   .start-sub{font-size:13px;color:var(--muted);margin-bottom:26px;}
+  .commander-label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px;text-align:left;}
+  .commander-select{width:100%;padding:11px 12px;border-radius:9px;border:1px solid var(--panel-border);background:rgba(0,0,0,0.25);color:var(--text-light);font-size:14px;margin-bottom:14px;-webkit-appearance:none;appearance:none;}
+  .review-toggle-row{margin-bottom:8px;}
+  .review-toggle-row button{width:100%;padding:10px;border-radius:9px;border:1px solid var(--panel-border);background:none;color:var(--muted);font-size:13px;}
+  .review-toggle-row button.active{background:rgba(216,174,102,0.15);color:var(--brass-bright);border-color:var(--brass);}
+  .rating-prompt{text-align:center;margin:8px 0 22px;}
+  .rating-label{font-size:13px;color:var(--muted);margin-bottom:10px;}
+  .rating-rings{display:flex;justify-content:center;gap:10px;}
+  .ring-btn{background:none;border:none;padding:4px;display:flex;flex-direction:column;align-items:center;gap:2px;color:var(--muted);}
+  .ring-btn:active{color:var(--brass-bright);}
+  .ring-btn .ring-num{font-size:11px;}
+  .rating-scale-hint{display:flex;justify-content:space-between;max-width:200px;margin:8px auto 0;font-size:11px;color:var(--muted);}
+  .review-subhead{font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:var(--brass-bright);margin:12px 0 4px;}
+  .review-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.06);font-size:13px;gap:10px;}
+  .review-name{color:var(--text-light);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .review-score{color:var(--muted);flex-shrink:0;white-space:nowrap;}
 
   /* draw button + helper */
   .draw-btn{display:block;width:100%;padding:11px;font-size:14px;font-weight:600;letter-spacing:0.02em;background:linear-gradient(180deg,var(--brass-bright),var(--brass));color:var(--ink-deep);border:none;border-radius:10px;margin-bottom:4px;}
@@ -184,6 +200,19 @@
   var showGameMenu = false;
   var justDrawnAnimation = false;
   var storageError = false;
+  var reviewModeChecked = false;
+  var selectedCommander = '';
+  var COMMANDER_LIST = [
+    "Thorin, King of Durin's Folk",
+    "The Great Goblin",
+    "Gandalf, Party Guest",
+    "Radagast of Rhosgobel",
+    "\u00c9owyn, Shieldmaiden",
+    "Frodo, Adventurous Hobbit & Sam, Loyal Attendant",
+    "Arwen Und\u00f3miel",
+    "Sauron, the Dark Lord"
+  ];
+  var pendingClearRatings = false;
   var STORAGE_MODE = 'local';
   try {
     if (typeof window.storage !== 'undefined' && window.storage && typeof window.storage.get === 'function'){
@@ -396,25 +425,32 @@
       seedId: 'seed-secrets-of-the-lake-v1',
       name: 'Secrets of the Lake',
       text: 'When you set this scheme in motion, put Monstrosity of the Lake onto the battlefield under your control.',
-      type: 'oneshot', qty: 1, art: null
+      type: 'oneshot', qty: 1, art: '<svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg"><defs><filter id="sl1" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="10"/></filter><filter id="sl2" x="-200%" y="-200%" width="500%" height="500%"><feGaussianBlur stdDeviation="3"/></filter><linearGradient id="slbg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0e2430"/><stop offset="55%" stop-color="#0a1a22"/><stop offset="100%" stop-color="#02080a"/></linearGradient><radialGradient id="slglow" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#3a6b78" stop-opacity="0.7"/><stop offset="100%" stop-color="#3a6b78" stop-opacity="0"/></radialGradient></defs><rect width="400" height="200" fill="url(#slbg)"/><circle cx="300" cy="45" r="18" fill="#dff0e8" opacity="0.5" filter="url(#sl1)"/><circle cx="300" cy="45" r="10" fill="#eaf6f0" opacity="0.7"/><ellipse cx="200" cy="150" rx="180" ry="14" fill="#0a1a1e" opacity="0.6"/><g stroke="#2a5058" stroke-width="1.5" fill="none" opacity="0.5"><path d="M60,140 Q200,132 340,140"/><path d="M40,152 Q200,144 360,152"/><path d="M80,163 Q200,157 320,163"/></g><ellipse cx="205" cy="148" rx="80" ry="30" fill="url(#slglow)" filter="url(#sl1)"/><path d="M150,150 Q175,110 205,118 Q235,110 260,150 Q235,145 205,140 Q175,145 150,150 Z" fill="#0a1518" opacity="0.85" filter="url(#sl2)"/><circle cx="188" cy="128" r="3" fill="#8fd9c0" opacity="0.7" filter="url(#sl2)"/><circle cx="222" cy="128" r="3" fill="#8fd9c0" opacity="0.7" filter="url(#sl2)"/></svg>'
     },
     {
       seedId: 'seed-bridge-of-khazad-dum-v1',
       name: 'The Bridge of Khazad-d\u00fbm',
       text: 'When you set this scheme in motion, each player chooses up to one creature they control, then sacrifices the rest.',
-      type: 'oneshot', qty: 1, art: null
+      type: 'oneshot', qty: 1, art: '<svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg"><defs><filter id="bk1" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="18"/></filter><filter id="bk2" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="5"/></filter><linearGradient id="bkbg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1c130a"/><stop offset="55%" stop-color="#120c08"/><stop offset="100%" stop-color="#050302"/></linearGradient><linearGradient id="bkrock" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#3a2c1c"/><stop offset="100%" stop-color="#0c0806"/></linearGradient></defs><rect width="400" height="200" fill="url(#bkbg)"/><ellipse cx="200" cy="200" rx="190" ry="55" fill="#e8641c" opacity="0.5" filter="url(#bk1)"/><ellipse cx="200" cy="195" rx="140" ry="30" fill="#ffb35c" opacity="0.35" filter="url(#bk2)"/><polygon points="0,75 145,42 158,58 20,98" fill="url(#bkrock)" stroke="#050302" stroke-width="1.5"/><polygon points="400,75 255,42 242,58 380,98" fill="url(#bkrock)" stroke="#050302" stroke-width="1.5"/><path d="M145,50 Q200,32 255,50 L255,64 Q200,48 145,64 Z" fill="#4a3a24" stroke="#1c140c" stroke-width="1.5"/><g fill="#ff9d3d" opacity="0.7" filter="url(#bk2)"><circle cx="110" cy="160" r="2.4"/><circle cx="290" cy="170" r="2.8"/><circle cx="200" cy="185" r="2.2"/><circle cx="150" cy="140" r="1.8"/><circle cx="250" cy="150" r="2"/><circle cx="200" cy="130" r="1.6"/></g></svg>'
     },
     {
       seedId: 'seed-fires-of-mount-doom-v1',
       name: 'Fires of Mount Doom',
       text: 'When you set this scheme in motion, destroy up to two target artifacts.',
-      type: 'oneshot', qty: 1, art: null
+      type: 'oneshot', qty: 1, art: '<svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg"><defs><filter id="fm1" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="16"/></filter><filter id="fm2" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="4"/></filter><radialGradient id="fmbg" cx="50%" cy="35%" r="90%"><stop offset="0%" stop-color="#4a2008"/><stop offset="100%" stop-color="#0a0402"/></radialGradient><linearGradient id="fmglow" x1="0" y1="1" x2="0" y2="0"><stop offset="0%" stop-color="#ffcf7a"/><stop offset="60%" stop-color="#e8641c"/><stop offset="100%" stop-color="#5a1e06"/></linearGradient></defs><rect width="400" height="200" fill="url(#fmbg)"/><circle cx="200" cy="70" r="55" fill="#ff9d3d" opacity="0.4" filter="url(#fm1)"/><polygon points="60,200 200,40 340,200" fill="#0a0704" stroke="#050302" stroke-width="1"/><polygon points="160,70 200,40 240,70 225,90 175,90" fill="url(#fmglow)" filter="url(#fm2)"/><path d="M195,55 Q205,40 215,55 Q220,45 228,55" stroke="#ffe29a" stroke-width="2" fill="none" opacity="0.7" filter="url(#fm2)"/><g fill="#ffb35c" opacity="0.6" filter="url(#fm2)"><circle cx="170" cy="30" r="2"/><circle cx="230" cy="20" r="1.8"/><circle cx="200" cy="10" r="1.6"/></g></svg>'
     },
     {
       seedId: 'seed-council-of-elrond-v1',
       name: 'The Council of Elrond',
       text: 'When you set this scheme in motion, the Ring tempts each player, starting with the player to your left. Then you may have target legendary creature you control fight up to one target legendary creature you don\'t control.',
-      type: 'oneshot', qty: 1, art: null
+      type: 'oneshot', qty: 1, art: '<svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg"><defs><filter id="ce1" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="14"/></filter><filter id="ce2" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="4"/></filter><radialGradient id="cebg" cx="50%" cy="45%" r="85%"><stop offset="0%" stop-color="#2e2410"/><stop offset="100%" stop-color="#08060a"/></radialGradient><radialGradient id="ceglow" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#ffe29a"/><stop offset="70%" stop-color="#c9a05a"/><stop offset="100%" stop-color="#8a5a1e" stop-opacity="0"/></radialGradient></defs><rect width="400" height="200" fill="url(#cebg)"/><circle cx="200" cy="120" r="40" fill="url(#ceglow)" opacity="0.7" filter="url(#ce1)"/><circle cx="200" cy="120" r="9" fill="#fff3d0" opacity="0.9" filter="url(#ce2)"/><g fill="#100c14" filter="url(#ce2)"><ellipse cx="120" cy="140" rx="14" ry="26"/><ellipse cx="120" cy="105" rx="10" ry="10"/><ellipse cx="280" cy="140" rx="14" ry="26"/><ellipse cx="280" cy="105" rx="10" ry="10"/><ellipse cx="170" cy="165" rx="13" ry="24"/><ellipse cx="170" cy="132" rx="9" ry="9"/><ellipse cx="230" cy="165" rx="13" ry="24"/><ellipse cx="230" cy="132" rx="9" ry="9"/><ellipse cx="200" cy="175" rx="13" ry="22"/><ellipse cx="200" cy="145" rx="9" ry="9"/></g></svg>'
+    },
+    {
+      seedId: 'seed-much-needed-reinforcements-v1',
+      name: 'Much Needed Reinforcements',
+      text: 'When you set this scheme in motion, draft a card from the booster pack, then exile it face down. You may play that card for as long as it remains exiled. Add three mana in any combination of colors. Spend this mana only to play that card. At the end of your turn, if that card is still exiled, put it into your hand.',
+      type: 'oneshot', qty: 1,
+      art: '<svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg"><defs><filter id="mn1" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="16"/></filter><filter id="mn2" x="-200%" y="-200%" width="500%" height="500%"><feGaussianBlur stdDeviation="3"/></filter><radialGradient id="mnbg" cx="50%" cy="50%" r="80%"><stop offset="0%" stop-color="#241c30"/><stop offset="100%" stop-color="#06050a"/></radialGradient><linearGradient id="mncard" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#2a2038"/><stop offset="100%" stop-color="#100c18"/></linearGradient></defs><rect width="400" height="200" fill="url(#mnbg)"/><ellipse cx="200" cy="120" rx="90" ry="55" fill="#c9a8ff" opacity="0.28" filter="url(#mn1)"/><g transform="translate(200,120) rotate(-6)"><rect x="-55" y="-75" width="110" height="150" rx="8" fill="url(#mncard)" stroke="#4a3a60" stroke-width="2"/><rect x="-45" y="-65" width="90" height="130" rx="4" fill="none" stroke="#5a4870" stroke-width="1" opacity="0.6"/></g><g stroke="#d8ae66" stroke-width="1.4" opacity="0.65" filter="url(#mn2)"><path d="M155,60 Q160,90 150,120"/><path d="M245,55 Q252,90 258,125"/><path d="M170,175 Q200,182 230,173"/></g><g fill="#ffe29a" filter="url(#mn2)"><circle cx="150" cy="95" r="2" opacity="0.7"/><circle cx="255" cy="100" r="2.2" opacity="0.65"/><circle cx="200" cy="185" r="1.8" opacity="0.6"/><circle cx="170" cy="60" r="1.5" opacity="0.5"/></g></svg>'
     }
   ];
 
@@ -585,6 +621,39 @@
   function nextTurn(){ game.turn += 1; game.drawnThisTurn = false; saveGame(); render(); }
   function prevTurn(){ if (game.turn > 0){ game.turn -= 1; game.drawnThisTurn = false; saveGame(); render(); } }
 
+  var audioCtx = null;
+  function getAudioCtx(){
+    if (!audioCtx){
+      try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+      catch (e) { audioCtx = null; }
+    }
+    return audioCtx;
+  }
+  function playChime(){
+    var ctx = getAudioCtx();
+    if (!ctx) return;
+    try {
+      if (ctx.state === 'suspended') ctx.resume();
+      var now = ctx.currentTime;
+      var freqs = [523.25, 659.25, 783.99];
+      freqs.forEach(function(freq, i){
+        var osc = ctx.createOscillator();
+        var gain = ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.value = freq;
+        var startTime = now + i * 0.07;
+        gain.gain.setValueAtTime(0, startTime);
+        gain.gain.linearRampToValueAtTime(0.15, startTime + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.9);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(startTime);
+        osc.stop(startTime + 1);
+      });
+    } catch (e) { /* ignore - sound is a nice-to-have, never block gameplay on it */ }
+  }
+  function toggleSound(){ library.soundEffects = (library.soundEffects === false); saveLibrary(); render(); }
+
   function drawScheme(){
     var pool = activeDrawPool();
     if (game.drawnThisTurn || !isEligible()) return;
@@ -599,11 +668,30 @@
     if (card.type === 'ongoing'){ game.ongoing.push(drawn); }
     else if (!card.firstTurnOnly){ game.deck.push(drawn); }
     justDrawnAnimation = true;
+    if (library.soundEffects !== false) playChime();
     saveGame();
     render();
   }
 
-  function dismissLastDrawn(){ game.lastDrawn = null; nextTurn(); }
+  function dismissLastDrawn(){
+    if (game.reviewMode && game.lastDrawn){
+      game.lastDrawn.awaitingRating = true;
+      saveGame();
+      render();
+      return;
+    }
+    game.lastDrawn = null;
+    nextTurn();
+  }
+
+  function rateLastDrawn(score){
+    if (!game.lastDrawn) return;
+    if (!library.ratings) library.ratings = [];
+    library.ratings.push({ id: uid(), cardId: game.lastDrawn.cardId, name: game.lastDrawn.name, turn: game.turn, score: score, timestamp: Date.now(), commander: game.commander || null });
+    saveLibrary();
+    game.lastDrawn = null;
+    nextTurn();
+  }
 
   function abandonOngoing(instanceId){
     var idx = -1;
@@ -623,6 +711,7 @@
     showBackup = false;
     bulkMode = false;
     showGameMenu = false;
+    pendingClearRatings = false;
     render();
   }
 
@@ -780,11 +869,17 @@
   }
 
   function startGame(){
+    if (!selectedCommander) return;
     rebuildDeck(true, false);
     game.started = true;
+    game.reviewMode = reviewModeChecked;
+    game.commander = selectedCommander;
+    selectedCommander = '';
     saveGame();
     render();
   }
+  function onCommanderChange(sel){ selectedCommander = sel.value; render(); }
+  function toggleReviewModeChecked(){ reviewModeChecked = !reviewModeChecked; render(); }
 
   function confirmNewGame(){
     if (pendingNewGame){
@@ -853,6 +948,21 @@
     var h = Math.round(size * 100 / 115);
     return '<svg viewBox="0 0 115 100" width="' + size + '" height="' + h + '" xmlns="http://www.w3.org/2000/svg">' + birdMarkup() + '</svg>';
   }
+  function ringIcon(size){
+    return '<svg viewBox="0 0 40 40" width="' + size + '" height="' + size + '" xmlns="http://www.w3.org/2000/svg"><circle cx="20" cy="20" r="14" fill="none" stroke="currentColor" stroke-width="5"/></svg>';
+  }
+  function renderRatingPrompt(){
+    var html = '<div class="rating-prompt">';
+    html += '<div class="rating-label">How strong did that feel?</div>';
+    html += '<div class="rating-rings">';
+    for (var i = 1; i <= 5; i++){
+      html += '<button class="ring-btn" onclick="App.rateLastDrawn(' + i + ')">' + ringIcon(28) + '<span class="ring-num">' + i + '</span></button>';
+    }
+    html += '</div>';
+    html += '<div class="rating-scale-hint"><span>Weak</span><span>Strong</span></div>';
+    html += '</div>';
+    return html;
+  }
   function defaultArtSVG(){
     return '<svg viewBox="0 0 400 200" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">' +
       '<rect width="400" height="200" fill="#171d13"/>' +
@@ -903,9 +1013,10 @@
 
   function renderHeader(){
     var gearBtn = (game && game.started) ? '<button class="gear-btn" onclick="App.toggleGameMenu()" aria-label="Game menu">⚙</button>' : '';
+    var subtitle = (game && game.started && game.commander) ? 'Archenemy: ' + esc(game.commander) : 'a scheme-keeper for Middle-earth game night';
     var html = '<div class="topbar">' +
       '<div class="topbar-left"><div class="seal-mini">' + birdSVG(38) + '</div>' +
-      '<div><div class="app-title">Arbeider Archenemy</div><div class="app-subtitle">a scheme-keeper for Middle-earth game night</div></div></div>' +
+      '<div><div class="app-title">Arbeider Archenemy</div><div class="app-subtitle">' + subtitle + '</div></div></div>' +
       gearBtn +
       '</div>';
     if (showGameMenu && game && game.started){
@@ -930,7 +1041,17 @@
     if (library.cards.length === 0){
       html += '<div class="empty-note">Add some schemes in the Cards tab first.</div>';
     } else {
-      html += '<button class="btn btn-primary btn-block" onclick="App.startGame()">Start New Game</button>';
+      html += '<label class="commander-label">Archenemy\'s commander</label>';
+      html += '<select class="commander-select" onchange="App.onCommanderChange(this)">';
+      html += '<option value="" disabled' + (selectedCommander === '' ? ' selected' : '') + '>Choose a commander…</option>';
+      COMMANDER_LIST.forEach(function(name){
+        html += '<option value="' + esc(name) + '"' + (selectedCommander === name ? ' selected' : '') + '>' + esc(name) + '</option>';
+      });
+      html += '</select>';
+      html += '<div class="review-toggle-row"><button class="' + (reviewModeChecked ? 'active' : '') + '" onclick="App.toggleReviewModeChecked()">Rate scheme power this game</button></div>';
+      html += '<div class="hint">If on, after resolving each scheme you\'ll rate how strong it felt. Ratings are saved so you can review and rebalance later, in the Rules tab.</div>';
+      html += '<button class="btn btn-primary btn-block" ' + (selectedCommander ? '' : 'disabled') + ' onclick="App.startGame()">Start New Game</button>';
+      if (!selectedCommander) html += '<div class="hint">Choose a commander to continue.</div>';
     }
     html += '</div>';
     return html;
@@ -970,7 +1091,11 @@
         html += '<div class="scheme-card-type ' + d.type + '">' + (d.type === 'ongoing' ? 'Scheme — Ongoing' : 'Scheme') + '</div>';
         html += '<div class="scheme-card-text">' + esc(d.text) + '</div>';
         html += '</div>';
-        html += '<div class="scheme-card-actions-row"><button class="btn btn-primary btn-block" onclick="App.dismissLastDrawn()">' + (d.type === 'ongoing' ? 'Set in Play → Next Turn' : 'Resolved → Next Turn') + '</button></div>';
+        if (d.awaitingRating){
+          html += renderRatingPrompt();
+        } else {
+          html += '<div class="scheme-card-actions-row"><button class="btn btn-primary btn-block" onclick="App.dismissLastDrawn()">' + (d.type === 'ongoing' ? 'Set in Play → Next Turn' : 'Resolved → Next Turn') + '</button></div>';
+        }
       }
 
       if (game.ongoing.length > 0){
@@ -992,7 +1117,7 @@
       }
 
       var deckCount = game.deck.length + (game.turn === 1 ? game.starterDeck.length : 0);
-      html += '<div class="deck-footer">' + deckCount + ' in deck · ' + game.ongoing.length + ' in play</div>';
+      html += '<div class="deck-footer">' + deckCount + ' in deck · ' + game.ongoing.length + ' in play' + (game.reviewMode ? ' · rating on' : '') + '</div>';
     }
     return html;
   }
@@ -1058,6 +1183,65 @@
     return html;
   }
 
+  function confirmClearRatings(){
+    if (pendingClearRatings){
+      library.ratings = [];
+      saveLibrary();
+      pendingClearRatings = false;
+    } else {
+      pendingClearRatings = true;
+    }
+    render();
+  }
+
+  function renderPowerReviews(){
+    var ratings = library.ratings || [];
+    if (ratings.length === 0) return '';
+    var byCard = {};
+    ratings.forEach(function(r){
+      if (!byCard[r.cardId]) byCard[r.cardId] = { name: r.name, scores: [] };
+      byCard[r.cardId].scores.push(r.score);
+    });
+    var cardRows = Object.keys(byCard).map(function(cardId){
+      var entry = byCard[cardId];
+      var currentCard = findCardById(cardId);
+      var displayName = currentCard ? currentCard.name : entry.name + ' (removed)';
+      var sum = entry.scores.reduce(function(a, b){ return a + b; }, 0);
+      return { name: displayName, avg: sum / entry.scores.length, count: entry.scores.length };
+    });
+    cardRows.sort(function(a, b){ return a.avg - b.avg; });
+
+    var byCommander = {};
+    ratings.forEach(function(r){
+      var key = r.commander || 'Not recorded';
+      if (!byCommander[key]) byCommander[key] = [];
+      byCommander[key].push(r.score);
+    });
+    var commanderRows = Object.keys(byCommander).map(function(name){
+      var scores = byCommander[name];
+      var sum = scores.reduce(function(a, b){ return a + b; }, 0);
+      return { name: name, avg: sum / scores.length, count: scores.length };
+    });
+    commanderRows.sort(function(a, b){ return b.avg - a.avg; });
+
+    var html = '<div class="rules-section">';
+    html += '<div class="section-label">Power reviews (' + ratings.length + ' rating' + (ratings.length === 1 ? '' : 's') + ')</div>';
+    if (commanderRows.length > 0){
+      html += '<div class="review-subhead">By commander (strongest-feeling first)</div>';
+      commanderRows.forEach(function(row){
+        html += '<div class="review-row"><span class="review-name">' + esc(row.name) + '</span><span class="review-score">' + row.avg.toFixed(1) + ' avg · ' + row.count + 'x</span></div>';
+      });
+    }
+    html += '<div class="review-subhead">By card (weakest first)</div>';
+    cardRows.forEach(function(row){
+      html += '<div class="review-row"><span class="review-name">' + esc(row.name) + '</span><span class="review-score">' + row.avg.toFixed(1) + ' avg · ' + row.count + 'x</span></div>';
+    });
+    html += '<button class="btn btn-danger" onclick="App.confirmClearRatings()">' + (pendingClearRatings ? 'Confirm clear?' : 'Clear all ratings') + '</button>';
+    html += '<div class="hint">Ratings are included in your backup code.</div>';
+    html += '</div>';
+    return html;
+  }
+
   function renderRules(){
     var html = '';
     html += '<div class="rules-section">';
@@ -1073,6 +1257,14 @@
     html += '<button class="btn btn-ghost" onclick="App.reshuffleNow()">Reshuffle deck</button>';
     html += '<div class="hint">Reshuffle keeps the turn count and just remixes the deck. To restart or end the current game, use the ⚙ menu at the top of the Table tab.</div>';
     html += '</div>';
+
+    html += '<div class="rules-section">';
+    html += '<div class="section-label">Sound</div>';
+    html += '<div class="type-toggle"><button class="' + (library.soundEffects !== false ? 'active' : '') + '" onclick="App.toggleSound()">Sound effects</button></div>';
+    html += '<div class="hint">A short chime plays when you draw a scheme.</div>';
+    html += '</div>';
+
+    html += renderPowerReviews();
 
     html += '<div class="rules-section">';
     html += '<div class="section-label">Backup</div>';
@@ -1109,6 +1301,8 @@
     copyBackup: copyBackup, doImport: doImport, onArtFileSelected: onArtFileSelected, removeArt: removeArt,
     toggleBulk: toggleBulk, saveBulkCards: saveBulkCards, startGame: startGame,
     toggleFirstTurnOnly: toggleFirstTurnOnly,
+    onCommanderChange: onCommanderChange, toggleSound: toggleSound,
+    toggleReviewModeChecked: toggleReviewModeChecked, rateLastDrawn: rateLastDrawn, confirmClearRatings: confirmClearRatings,
     toggleGameMenu: toggleGameMenu, goToMainMenu: goToMainMenu
   };
 
