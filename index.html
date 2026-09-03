@@ -251,6 +251,9 @@
     return a;
   }
 
+  // Seed IDs listed here are actively stripped from any saved library, even if already present.
+  var REMOVED_SEED_IDS = ['seed-dwarven-prospectors-v1', 'seed-uruk-hai-reinforcements-v1'];
+
   var SEED_CARDS = [
     {
       seedId: 'seed-watcher-awakens-v1',
@@ -263,37 +266,37 @@
     {
       seedId: 'seed-fellowship-scatters-v1',
       name: 'The Fellowship Scatters',
-      text: 'When you set this scheme in motion, each opponent sacrifices a creature.',
+      text: 'When you set this scheme in motion, the Ring tempts you. Then each opponent sacrifices a creature.',
       type: 'oneshot', qty: 1, art: '<svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg"><defs><filter id="fs1" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="7"/></filter><filter id="fs2" x="-300%" y="-300%" width="700%" height="700%"><feGaussianBlur stdDeviation="2.5"/></filter><radialGradient id="fsbg" cx="45%" cy="40%" r="80%"><stop offset="0%" stop-color="#232838"/><stop offset="100%" stop-color="#04050a"/></radialGradient></defs><rect width="400" height="200" fill="url(#fsbg)"/><path d="M175,90 Q200,75 225,90 L232,120 Q235,145 220,165 L215,190 L185,190 L180,165 Q165,145 168,120 Z" fill="#0a0a12" filter="url(#fs1)"/><g fill="#aab4d0" filter="url(#fs2)"><circle cx="245" cy="85" r="3" opacity="0.75"/><circle cx="265" cy="65" r="2.2" opacity="0.6"/><circle cx="280" cy="100" r="2.6" opacity="0.65"/><circle cx="260" cy="130" r="2" opacity="0.55"/><circle cx="295" cy="75" r="1.8" opacity="0.45"/><circle cx="140" cy="90" r="2.4" opacity="0.55"/><circle cx="120" cy="115" r="2" opacity="0.5"/><circle cx="105" cy="80" r="1.6" opacity="0.4"/><circle cx="270" cy="150" r="1.6" opacity="0.4"/><circle cx="150" cy="140" r="1.5" opacity="0.4"/></g></svg>'
     },
     {
       seedId: 'seed-shelobs-ambush-v1',
       name: 'Shelob\'s Ambush',
-      text: 'When you set this scheme in motion, destroy target creature. If that creature had power 4 or greater, its controller loses 3 life.',
+      text: 'When you set this scheme in motion, put Shelob, Child of Ungoliant onto the battlefield under your control.',
       type: 'oneshot', qty: 1, art: '<svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg"><defs><filter id="fogblur" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="14"/></filter><filter id="legblur" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="5"/></filter><filter id="eyeglow" x="-150%" y="-150%" width="400%" height="400%"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter><radialGradient id="bg" cx="55%" cy="60%" r="80%"><stop offset="0%" stop-color="#14180c"/><stop offset="55%" stop-color="#080a05"/><stop offset="100%" stop-color="#020302"/></radialGradient><radialGradient id="bodyshade" cx="40%" cy="30%" r="70%"><stop offset="0%" stop-color="#2a3218"/><stop offset="100%" stop-color="#050702"/></radialGradient></defs><rect width="400" height="200" fill="url(#bg)"/><g filter="url(#legblur)" opacity="0.55" stroke="#1c2410" stroke-width="10" stroke-linecap="round" fill="none"><path d="M120,150 Q60,120 10,140"/><path d="M130,170 Q70,175 20,195"/><path d="M290,150 Q350,120 395,145"/><path d="M280,170 Q345,178 390,198"/></g><ellipse cx="205" cy="130" rx="130" ry="85" fill="#050603" filter="url(#fogblur)" opacity="0.9"/><ellipse cx="200" cy="110" rx="75" ry="52" fill="url(#bodyshade)" filter="url(#fogblur)"/><ellipse cx="195" cy="70" rx="30" ry="24" fill="#171f0e" filter="url(#legblur)"/><circle cx="184" cy="66" r="4.5" fill="#ff9d3d" filter="url(#eyeglow)"/><circle cx="206" cy="66" r="4.5" fill="#ff9d3d" filter="url(#eyeglow)"/><circle cx="178" cy="74" r="2.6" fill="#e8641c" filter="url(#eyeglow)" opacity="0.85"/><circle cx="212" cy="74" r="2.6" fill="#e8641c" filter="url(#eyeglow)" opacity="0.85"/></svg>'
     },
     {
       seedId: 'seed-cast-into-the-fire-v1',
       name: 'Cast into the Fire',
-      text: 'When you set this scheme in motion, exile target nonland permanent.',
+      text: 'When you set this scheme in motion, the Ring tempts you. Then exile target nonland, noncreature permanent.',
       type: 'oneshot', qty: 1, art: '<svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg"><defs><filter id="cf1" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="14"/></filter><filter id="cf2" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="3"/></filter><radialGradient id="cfbg" cx="50%" cy="75%" r="85%"><stop offset="0%" stop-color="#5a2408"/><stop offset="100%" stop-color="#050201"/></radialGradient><linearGradient id="cfflame" x1="0" y1="1" x2="0" y2="0"><stop offset="0%" stop-color="#6b2408"/><stop offset="45%" stop-color="#e8641c"/><stop offset="85%" stop-color="#ffb84d"/><stop offset="100%" stop-color="#fff3d0"/></linearGradient></defs><rect width="400" height="200" fill="url(#cfbg)"/><ellipse cx="200" cy="175" rx="130" ry="35" fill="#ff9d3d" opacity="0.45" filter="url(#cf1)"/><path d="M200,195 C155,160 165,120 188,95 C182,118 198,128 203,112 C213,132 232,124 226,100 C252,128 248,165 212,195 Z" fill="url(#cfflame)" filter="url(#cf2)"/><path d="M200,195 C178,175 183,150 196,132 C194,145 202,150 205,142 C211,153 220,148 217,135 C230,150 228,172 208,195 Z" fill="#ffe9b0" opacity="0.55" filter="url(#cf2)"/></svg>'
     },
     {
       seedId: 'seed-frost-of-caradhras-v1',
       name: 'Frost of Caradhras',
-      text: 'When you set this scheme in motion, creatures your opponents control get -2/-0 until end of turn.',
+      text: 'When you set this scheme in motion, put a stun counter on up to three target creatures.\n(If a permanent with a stun counter on it would untap, remove one of those counters from it instead.)',
       type: 'oneshot', qty: 1, art: '<svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg"><defs><filter id="fr1" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="9"/></filter><filter id="fr2" x="-200%" y="-200%" width="500%" height="500%"><feGaussianBlur stdDeviation="3"/></filter><linearGradient id="frbg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#173042"/><stop offset="100%" stop-color="#020608"/></linearGradient></defs><rect width="400" height="200" fill="url(#frbg)"/><ellipse cx="230" cy="60" rx="90" ry="40" fill="#bfe6ff" opacity="0.3" filter="url(#fr1)"/><path d="M60,200 L140,70 L185,130 L230,40 L280,120 L320,80 L370,200 Z" fill="#0c1620" filter="url(#fr1)"/><path d="M230,40 L245,65 L220,70 Z" fill="#eaf6ff" opacity="0.6" filter="url(#fr2)"/><g fill="#eaf6ff" filter="url(#fr2)"><circle cx="90" cy="90" r="1.6" opacity="0.6"/><circle cx="310" cy="110" r="1.8" opacity="0.55"/><circle cx="150" cy="60" r="1.4" opacity="0.5"/><circle cx="270" cy="70" r="1.5" opacity="0.5"/><circle cx="200" cy="150" r="1.6" opacity="0.4"/></g></svg>'
     },
     {
       seedId: 'seed-whispers-of-the-ringwraiths-v1',
       name: 'Whispers of the Ringwraiths',
-      text: 'When you set this scheme in motion, each opponent discards two cards.',
+      text: 'When you set this scheme in motion, each opponent discards a card. Draw cards equal to the number of cards discarded this way.',
       type: 'oneshot', qty: 1, art: '<svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg"><defs><filter id="wr1" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="8"/></filter><filter id="wr2" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="4"/></filter><radialGradient id="wrbg" cx="50%" cy="30%" r="85%"><stop offset="0%" stop-color="#1c2038"/><stop offset="100%" stop-color="#030309"/></radialGradient></defs><rect width="400" height="200" fill="url(#wrbg)"/><path d="M140,60 C165,60 178,90 172,120 C182,145 176,175 168,195 L112,195 C104,175 98,145 108,120 C102,90 115,60 140,60 Z" fill="#0a0a16" opacity="0.5" filter="url(#wr1)"/><path d="M200,45 C230,45 245,80 238,115 C250,145 244,180 235,198 L165,198 C156,180 150,145 162,115 C155,80 170,45 200,45 Z" fill="#0d0d1a" filter="url(#wr1)"/><path d="M270,60 C295,60 308,90 302,120 C312,145 306,175 298,195 L242,195 C234,175 228,145 238,120 C232,90 245,60 270,60 Z" fill="#0a0a16" opacity="0.5" filter="url(#wr1)"/><path d="M200,50 Q220,70 214,100" stroke="#5a6bb0" stroke-width="1.5" fill="none" opacity="0.45" filter="url(#wr2)"/></svg>'
     },
     {
       seedId: 'seed-counsel-of-the-white-council-v1',
-      name: 'Counsel of the White Council',
-      text: 'When you set this scheme in motion, draw three cards.',
+      name: 'The White Council',
+      text: 'When you set this scheme in motion, the Ring tempts you. Then draw three cards.',
       type: 'oneshot', qty: 1, art: '<svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg"><defs><filter id="cw1" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="14"/></filter><filter id="cw2" x="-200%" y="-200%" width="500%" height="500%"><feGaussianBlur stdDeviation="3"/></filter><radialGradient id="cwbg" cx="50%" cy="60%" r="80%"><stop offset="0%" stop-color="#3a2c10"/><stop offset="100%" stop-color="#050402"/></radialGradient><linearGradient id="cwpage" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#fff3d0"/><stop offset="100%" stop-color="#c9a05a"/></linearGradient></defs><rect width="400" height="200" fill="url(#cwbg)"/><ellipse cx="200" cy="140" rx="100" ry="35" fill="#ffd166" opacity="0.35" filter="url(#cw1)"/><path d="M200,155 L130,168 L130,120 Q165,108 200,116 Z" fill="url(#cwpage)"/><path d="M200,155 L270,168 L270,120 Q235,108 200,116 Z" fill="url(#cwpage)"/><g fill="#ffe9b0" filter="url(#cw2)"><circle cx="200" cy="80" r="2.2" opacity="0.7"/><circle cx="215" cy="55" r="1.8" opacity="0.6"/><circle cx="185" cy="60" r="1.6" opacity="0.55"/><circle cx="205" cy="35" r="1.4" opacity="0.45"/><circle cx="230" cy="90" r="1.5" opacity="0.4"/></g></svg>'
     },
     {
@@ -305,7 +308,7 @@
     {
       seedId: 'seed-ringwraiths-cry-v1',
       name: 'The Ringwraiths\' Cry',
-      text: 'When you set this scheme in motion, each opponent loses 3 life. You gain life equal to the total life lost this way.',
+      text: 'When you set this scheme in motion, roll a six-sided die. Each opponent loses life equal to the result. You gain life equal to the total life lost this way.',
       type: 'oneshot', qty: 1, art: '<svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg"><defs><filter id="rc1" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="10"/></filter><filter id="rc2" x="-200%" y="-200%" width="500%" height="500%"><feGaussianBlur stdDeviation="4"/></filter><radialGradient id="rcbg" cx="65%" cy="35%" r="80%"><stop offset="0%" stop-color="#3a0a0a"/><stop offset="100%" stop-color="#040101"/></radialGradient></defs><rect width="400" height="200" fill="url(#rcbg)"/><path d="M270,50 C298,50 312,80 306,112 C320,140 314,172 304,192 L226,192 C216,172 210,140 224,112 C218,80 242,50 270,50 Z" fill="#0e0303" filter="url(#rc1)"/><path d="M110,155 Q170,115 225,122" stroke="#d84a4a" stroke-width="4" fill="none" opacity="0.55" filter="url(#rc2)"/><circle cx="108" cy="156" r="7" fill="#e05a5a" opacity="0.6" filter="url(#rc2)"/><circle cx="150" cy="140" r="3" fill="#e05a5a" opacity="0.5" filter="url(#rc2)"/></svg>'
     },
     {
@@ -317,20 +320,20 @@
     {
       seedId: 'seed-army-of-the-dead-v1',
       name: 'The Army of the Dead',
-      text: 'When you set this scheme in motion, create three 2/2 white Spirit creature tokens.',
+      text: 'When you set this scheme in motion, create two 1/1 colorless Shapeshifter creature tokens. Creatures you control gain deathtouch and lifelink until end of turn.',
       type: 'oneshot', qty: 1, art: '<svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg"><defs><filter id="ad1" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="9"/></filter><filter id="ad2" x="-200%" y="-200%" width="500%" height="500%"><feGaussianBlur stdDeviation="4"/></filter><radialGradient id="adbg" cx="50%" cy="45%" r="85%"><stop offset="0%" stop-color="#12291c"/><stop offset="100%" stop-color="#020604"/></radialGradient></defs><rect width="400" height="200" fill="url(#adbg)"/><path d="M145,195 C138,150 150,110 165,110 C180,110 192,150 185,195 Z" fill="#5aa06e" opacity="0.22" filter="url(#ad1)"/><path d="M255,195 C248,150 260,110 275,110 C290,110 302,150 295,195 Z" fill="#5aa06e" opacity="0.22" filter="url(#ad1)"/><path d="M175,198 C165,140 182,80 200,80 C218,80 235,140 225,198 Z" fill="#8fd9a0" opacity="0.4" filter="url(#ad1)"/><circle cx="200" cy="86" r="8" fill="#c8f5d4" opacity="0.55" filter="url(#ad2)"/></svg>'
     },
     {
       seedId: 'seed-horns-of-rohan-v1',
       name: 'Horns of Rohan',
-      text: 'When you set this scheme in motion, creatures you control get +2/+1 until end of turn.',
+      text: 'When you set this scheme in motion, distribute up to five +1/+1 counters among any number of target creatures you control.',
       type: 'oneshot', qty: 1, art: '<svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg"><defs><filter id="sunblur" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="18"/></filter><filter id="raysoft" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="2.5"/></filter><radialGradient id="dawn" cx="72%" cy="42%" r="65%"><stop offset="0%" stop-color="#ffcf7a"/><stop offset="35%" stop-color="#a8501c"/><stop offset="100%" stop-color="#0c0602"/></radialGradient><linearGradient id="hornshade" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#3a2408"/><stop offset="100%" stop-color="#0a0603"/></linearGradient></defs><rect width="400" height="200" fill="url(#dawn)"/><circle cx="285" cy="80" r="46" fill="#ffe8b8" filter="url(#sunblur)" opacity="0.8"/><g stroke="#ffcf7a" stroke-width="2" opacity="0.4" filter="url(#raysoft)"><line x1="285" y1="80" x2="285" y2="10"/><line x1="285" y1="80" x2="350" y2="40"/><line x1="285" y1="80" x2="360" y2="90"/><line x1="285" y1="80" x2="330" y2="140"/></g><path d="M110,165 Q140,90 235,68 Q270,64 264,88 Q205,90 178,138 Q162,168 132,172 Q104,175 110,165 Z" fill="url(#hornshade)"/><path d="M264,88 Q206,90 179,137" stroke="#ffcf7a" stroke-width="2" fill="none" opacity="0.6" filter="url(#raysoft)"/></svg>'
     },
     {
       seedId: 'seed-ents-march-v1',
       name: 'The Ents March',
-      text: 'When you set this scheme in motion, create two 3/4 green Treefolk creature tokens with reach.',
-      type: 'oneshot', qty: 1, art: '<svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg"><defs><filter id="mist" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="12"/></filter><filter id="rim" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="2.5"/></filter><linearGradient id="bg2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1c2c14"/><stop offset="60%" stop-color="#0c1408"/><stop offset="100%" stop-color="#030502"/></linearGradient><linearGradient id="trunkshade" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#080c05"/><stop offset="70%" stop-color="#141c0c"/><stop offset="100%" stop-color="#8fbf6e"/></linearGradient></defs><rect width="400" height="200" fill="url(#bg2)"/><g opacity="0.35" filter="url(#mist)"><path d="M310,200 C300,140 315,95 335,95 C355,95 365,140 350,200 Z" fill="#1c2810"/><path d="M100,200 C92,150 105,115 120,115 C135,115 145,150 135,200 Z" fill="#141e0c"/></g><path d="M235,200 L215,140 Q180,130 165,95 Q158,78 172,80 Q178,100 205,112 Q195,80 205,50 Q212,32 222,40 Q216,70 232,95 Q245,60 268,52 Q282,48 278,64 Q255,72 244,100 Q272,95 292,112 Q302,120 292,128 Q265,112 238,120 Q255,150 250,200 Z" fill="url(#trunkshade)"/><path d="M172,80 Q178,100 205,112 Q195,80 205,50" stroke="#8fbf6e" stroke-width="2" fill="none" opacity="0.55" filter="url(#rim)"/><path d="M268,52 Q282,48 278,64 Q255,72 244,100" stroke="#8fbf6e" stroke-width="2" fill="none" opacity="0.55" filter="url(#rim)"/><g opacity="0.5" stroke="#050803" stroke-width="2.5" fill="none"><path d="M225,160 Q218,150 224,135"/><path d="M238,175 Q246,163 240,148"/></g></svg>'
+      text: 'When you set this scheme in motion, reveal cards from the top of your library until you reveal a creature card. Put that card onto the battlefield and the rest on the bottom of your library in a random order.',
+      type: 'oneshot', qty: 1, minTurn: 3, art: '<svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg"><defs><filter id="mist" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="12"/></filter><filter id="rim" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="2.5"/></filter><linearGradient id="bg2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1c2c14"/><stop offset="60%" stop-color="#0c1408"/><stop offset="100%" stop-color="#030502"/></linearGradient><linearGradient id="trunkshade" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#080c05"/><stop offset="70%" stop-color="#141c0c"/><stop offset="100%" stop-color="#8fbf6e"/></linearGradient></defs><rect width="400" height="200" fill="url(#bg2)"/><g opacity="0.35" filter="url(#mist)"><path d="M310,200 C300,140 315,95 335,95 C355,95 365,140 350,200 Z" fill="#1c2810"/><path d="M100,200 C92,150 105,115 120,115 C135,115 145,150 135,200 Z" fill="#141e0c"/></g><path d="M235,200 L215,140 Q180,130 165,95 Q158,78 172,80 Q178,100 205,112 Q195,80 205,50 Q212,32 222,40 Q216,70 232,95 Q245,60 268,52 Q282,48 278,64 Q255,72 244,100 Q272,95 292,112 Q302,120 292,128 Q265,112 238,120 Q255,150 250,200 Z" fill="url(#trunkshade)"/><path d="M172,80 Q178,100 205,112 Q195,80 205,50" stroke="#8fbf6e" stroke-width="2" fill="none" opacity="0.55" filter="url(#rim)"/><path d="M268,52 Q282,48 278,64 Q255,72 244,100" stroke="#8fbf6e" stroke-width="2" fill="none" opacity="0.55" filter="url(#rim)"/><g opacity="0.5" stroke="#050803" stroke-width="2.5" fill="none"><path d="M225,160 Q218,150 224,135"/><path d="M238,175 Q246,163 240,148"/></g></svg>'
     },
     {
       seedId: 'seed-oaths-of-the-grey-company-v1',
@@ -351,12 +354,6 @@
       type: 'oneshot', qty: 1, art: '<svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg"><defs><filter id="ea1" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="20"/></filter><filter id="ea2" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="1.2"/></filter><linearGradient id="eabg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#2a3860"/><stop offset="60%" stop-color="#1c2035"/><stop offset="100%" stop-color="#3a2412"/></linearGradient><linearGradient id="eaglegrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#8a6a35"/><stop offset="100%" stop-color="#100c05"/></linearGradient></defs><rect width="400" height="200" fill="url(#eabg)"/><circle cx="200" cy="105" r="60" fill="#ffe29a" opacity="0.5" filter="url(#ea1)"/><path d="M200,110 C185,95 150,80 90,83 C120,90 145,100 160,112 C130,110 90,107 55,117 C95,120 135,130 165,125 C145,132 110,142 85,157 C120,150 155,137 178,127 L200,134 L222,127 C245,137 280,150 315,157 C290,142 255,132 235,125 C265,130 305,120 345,117 C310,107 270,110 240,112 C255,100 280,90 310,83 C250,80 215,95 200,110 Z" fill="url(#eaglegrad)" filter="url(#ea2)"/><ellipse cx="200" cy="112" rx="9" ry="7" fill="#e8c583" opacity="0.8"/></svg>'
     },
     {
-      seedId: 'seed-uruk-hai-reinforcements-v1',
-      name: 'Uruk-hai Reinforcements',
-      text: 'When you set this scheme in motion, create four 1/1 black Orc creature tokens.',
-      type: 'oneshot', qty: 1, art: '<svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg"><defs><filter id="ur1" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="14"/></filter><filter id="ur2" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="1.5"/></filter><radialGradient id="urbg" cx="50%" cy="80%" r="90%"><stop offset="0%" stop-color="#4a1408"/><stop offset="100%" stop-color="#040201"/></radialGradient></defs><rect width="400" height="200" fill="url(#urbg)"/><ellipse cx="200" cy="170" rx="180" ry="40" fill="#e8641c" opacity="0.28" filter="url(#ur1)"/><g stroke="#0a0705" stroke-width="6" filter="url(#ur2)"><line x1="100" y1="200" x2="90" y2="60"/><line x1="150" y1="200" x2="145" y2="40"/><line x1="200" y1="200" x2="200" y2="30"/><line x1="250" y1="200" x2="255" y2="45"/><line x1="300" y1="200" x2="310" y2="65"/></g><g fill="#3a3a3e"><polygon points="90,60 100,75 80,75"/><polygon points="145,40 156,58 134,58"/><polygon points="200,30 212,50 188,50"/><polygon points="255,45 266,63 244,63"/><polygon points="310,65 320,80 300,80"/></g></svg>'
-    },
-    {
       seedId: 'seed-one-ring-to-rule-them-all-v1',
       name: 'One Ring to Rule Them All',
       text: 'When you set this scheme in motion, put The One Ring onto the battlefield under your control.',
@@ -367,39 +364,57 @@
       seedId: 'seed-roads-go-ever-on-v1',
       name: 'Roads Go Ever On',
       text: 'When you set this scheme in motion, search your library for up to two basic land cards, put them onto the battlefield tapped, then shuffle.',
-      type: 'oneshot', qty: 1, art: '<svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg"><defs><filter id="rd1" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="16"/></filter><filter id="rd2" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="5"/></filter><linearGradient id="rdbg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#4a3010"/><stop offset="55%" stop-color="#1c1408"/><stop offset="100%" stop-color="#050301"/></linearGradient></defs><rect width="400" height="200" fill="url(#rdbg)"/><circle cx="200" cy="72" r="30" fill="#ffcf7a" opacity="0.55" filter="url(#rd1)"/><polygon points="150,200 250,200 210,75 190,75" fill="#0c0805" filter="url(#rd2)"/><polygon points="150,200 250,200 210,75 190,75" fill="none" stroke="#c9a05a" stroke-width="1" opacity="0.3"/></svg>'
-    },
-    {
-      seedId: 'seed-dwarven-prospectors-v1',
-      name: 'Dwarven Prospectors',
-      text: 'When you set this scheme in motion, create four Treasure tokens.\n(Treasure tokens are artifacts with "{T}, Sacrifice this artifact: Add one mana of any color.")',
-      type: 'oneshot', qty: 1, art: '<svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg"><defs><filter id="dp1" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="12"/></filter><filter id="dp2" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="4"/></filter><radialGradient id="dpbg" cx="50%" cy="50%" r="80%"><stop offset="0%" stop-color="#241a0a"/><stop offset="100%" stop-color="#030201"/></radialGradient></defs><rect width="400" height="200" fill="url(#dpbg)"/><path d="M40,60 L160,40 L220,90 L340,55 L370,140 L260,175 L180,130 L60,160 Z" fill="#100c08"/><path d="M80,110 Q140,90 170,110 Q210,95 250,115 Q290,100 320,120" stroke="#ffcf7a" stroke-width="4" fill="none" opacity="0.7" filter="url(#dp2)"/><circle cx="170" cy="110" r="18" fill="#ffe29a" opacity="0.5" filter="url(#dp1)"/><circle cx="270" cy="112" r="14" fill="#ffcf7a" opacity="0.45" filter="url(#dp1)"/></svg>'
+      type: 'oneshot', qty: 1, firstTurnOnly: true, art: '<svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg"><defs><filter id="rd1" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="16"/></filter><filter id="rd2" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="5"/></filter><linearGradient id="rdbg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#4a3010"/><stop offset="55%" stop-color="#1c1408"/><stop offset="100%" stop-color="#050301"/></linearGradient></defs><rect width="400" height="200" fill="url(#rdbg)"/><circle cx="200" cy="72" r="30" fill="#ffcf7a" opacity="0.55" filter="url(#rd1)"/><polygon points="150,200 250,200 210,75 190,75" fill="#0c0805" filter="url(#rd2)"/><polygon points="150,200 250,200 210,75 190,75" fill="none" stroke="#c9a05a" stroke-width="1" opacity="0.3"/></svg>'
     },
     {
       seedId: 'seed-bargain-with-the-dwarves-v1',
       name: 'Bargain with the Dwarves',
       text: 'When you set this scheme in motion, spells you cast cost {2} less to cast this turn.',
-      type: 'oneshot', qty: 1, art: '<svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg"><defs><filter id="bd1" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="18"/></filter><filter id="bd2" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="1"/></filter><radialGradient id="bdbg" cx="50%" cy="50%" r="75%"><stop offset="0%" stop-color="#2e2008"/><stop offset="100%" stop-color="#040301"/></radialGradient></defs><rect width="400" height="200" fill="url(#bdbg)"/><circle cx="200" cy="100" r="55" fill="#ffcf7a" opacity="0.45" filter="url(#bd1)"/><polygon points="200,55 235,95 200,150 165,95" fill="#ffe9b0" stroke="#8a5a1e" stroke-width="1" filter="url(#bd2)"/><polygon points="200,55 235,95 200,110 165,95" fill="#fff8e0" opacity="0.5"/></svg>'
+      type: 'oneshot', qty: 1, minTurn: 3, art: '<svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg"><defs><filter id="bd1" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="18"/></filter><filter id="bd2" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="1"/></filter><radialGradient id="bdbg" cx="50%" cy="50%" r="75%"><stop offset="0%" stop-color="#2e2008"/><stop offset="100%" stop-color="#040301"/></radialGradient></defs><rect width="400" height="200" fill="url(#bdbg)"/><circle cx="200" cy="100" r="55" fill="#ffcf7a" opacity="0.45" filter="url(#bd1)"/><polygon points="200,55 235,95 200,150 165,95" fill="#ffe9b0" stroke="#8a5a1e" stroke-width="1" filter="url(#bd2)"/><polygon points="200,55 235,95 200,110 165,95" fill="#fff8e0" opacity="0.5"/></svg>'
     },
     {
       seedId: 'seed-shires-bounty-v1',
       name: 'The Shire\'s Bounty',
       text: 'When you set this scheme in motion, search your library for a land card, put it onto the battlefield, then shuffle.',
-      type: 'oneshot', qty: 1, art: '<svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg"><defs><filter id="sb1" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="8"/></filter><filter id="sb2" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="6"/></filter><linearGradient id="sbbg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#6b7a3e"/><stop offset="55%" stop-color="#2a3818"/><stop offset="100%" stop-color="#0a0e06"/></linearGradient></defs><rect width="400" height="200" fill="url(#sbbg)"/><path d="M0,140 Q100,105 200,130 Q300,155 400,120 L400,200 L0,200 Z" fill="#3d4d24" opacity="0.9" filter="url(#sb1)"/><path d="M0,165 Q120,145 240,160 Q320,172 400,150 L400,200 L0,200 Z" fill="#1c2410"/><circle cx="270" cy="152" r="10" fill="#ffcf7a" opacity="0.8" filter="url(#sb2)"/></svg>'
+      type: 'oneshot', qty: 1, firstTurnOnly: true, art: '<svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg"><defs><filter id="sb1" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="8"/></filter><filter id="sb2" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="6"/></filter><linearGradient id="sbbg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#6b7a3e"/><stop offset="55%" stop-color="#2a3818"/><stop offset="100%" stop-color="#0a0e06"/></linearGradient></defs><rect width="400" height="200" fill="url(#sbbg)"/><path d="M0,140 Q100,105 200,130 Q300,155 400,120 L400,200 L0,200 Z" fill="#3d4d24" opacity="0.9" filter="url(#sb1)"/><path d="M0,165 Q120,145 240,160 Q320,172 400,150 L400,200 L0,200 Z" fill="#1c2410"/><circle cx="270" cy="152" r="10" fill="#ffcf7a" opacity="0.8" filter="url(#sb2)"/></svg>'
     },
     {
       seedId: 'seed-roots-of-the-shire-v1',
       name: 'Roots of the Shire',
       text: 'When you set this scheme in motion, search your library for a basic land card, put it onto the battlefield, then shuffle.',
-      type: 'oneshot', qty: 1, firstTurnOnly: true,
+      type: 'oneshot', qty: 1,
       art: '<svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg"><defs><filter id="rt1" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="9"/></filter><filter id="rt2" x="-200%" y="-200%" width="500%" height="500%"><feGaussianBlur stdDeviation="3"/></filter><linearGradient id="rtsky" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#2a3818"/><stop offset="100%" stop-color="#0e1408"/></linearGradient><linearGradient id="rtsoil" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#241a0e"/><stop offset="100%" stop-color="#030201"/></linearGradient></defs><rect width="400" height="100" fill="url(#rtsky)"/><rect y="100" width="400" height="100" fill="url(#rtsoil)"/><rect y="96" width="400" height="8" fill="#1c130a" opacity="0.8" filter="url(#rt1)"/><circle cx="198" cy="60" r="26" fill="#8fbf6e" opacity="0.35" filter="url(#rt1)"/><line x1="200" y1="100" x2="200" y2="52" stroke="#6b8f52" stroke-width="4" stroke-linecap="round"/><path d="M200,70 Q182,56 172,42" stroke="#7a9b5e" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M200,60 Q220,46 233,34" stroke="#7a9b5e" stroke-width="3" fill="none" stroke-linecap="round"/><ellipse cx="167" cy="38" rx="9" ry="5.5" fill="#8fbf6e" transform="rotate(-30 167 38)" filter="url(#rt2)"/><ellipse cx="238" cy="30" rx="9" ry="5.5" fill="#8fbf6e" transform="rotate(25 238 30)" filter="url(#rt2)"/><g stroke="#c9a05a" stroke-width="2.2" fill="none" opacity="0.6" filter="url(#rt2)"><path d="M200,102 Q175,116 155,150"/><path d="M200,102 Q225,120 245,155"/><path d="M200,102 Q198,132 195,168"/></g></svg>'
     },
     {
       seedId: 'seed-galadriels-gift-v1',
       name: 'Galadriel\'s Gift',
-      text: 'When you set this scheme in motion, you may cast a spell with mana value 3 or less from your hand this turn without paying its mana cost.',
-      type: 'oneshot', qty: 1, firstTurnOnly: true,
+      text: 'When you set this scheme in motion, you may cast a card from your hand this turn without paying its mana cost.',
+      type: 'oneshot', qty: 1,
       art: '<svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg"><defs><filter id="gg1" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="18"/></filter><filter id="gg2" x="-200%" y="-200%" width="500%" height="500%"><feGaussianBlur stdDeviation="3"/></filter><filter id="gg3" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="2"/></filter><radialGradient id="ggbg" cx="50%" cy="45%" r="80%"><stop offset="0%" stop-color="#1c2440"/><stop offset="100%" stop-color="#04050c"/></radialGradient><radialGradient id="ggglow" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#eaf2ff"/><stop offset="60%" stop-color="#a8c8ff"/><stop offset="100%" stop-color="#5a7ac0"/></radialGradient><linearGradient id="ggglass" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#dfe8ff" stop-opacity="0.15"/><stop offset="50%" stop-color="#ffffff" stop-opacity="0.35"/><stop offset="100%" stop-color="#dfe8ff" stop-opacity="0.15"/></linearGradient></defs><rect width="400" height="200" fill="url(#ggbg)"/><circle cx="200" cy="115" r="70" fill="url(#ggglow)" opacity="0.55" filter="url(#gg1)"/><!-- phial body --><path d="M188,80 L212,80 L212,100 Q232,120 228,150 Q224,178 200,180 Q176,178 172,150 Q168,120 188,100 Z" fill="url(#ggglow)" opacity="0.9"/><path d="M188,80 L212,80 L212,100 Q232,120 228,150 Q224,178 200,180 Q176,178 172,150 Q168,120 188,100 Z" fill="url(#ggglass)"/><path d="M188,80 L212,80 L212,100 Q232,120 228,150 Q224,178 200,180 Q176,178 172,150 Q168,120 188,100 Z" fill="none" stroke="#eaf2ff" stroke-width="1.5" opacity="0.6"/><!-- neck and stopper --><rect x="191" y="62" width="18" height="20" rx="3" fill="#cfe0ff" opacity="0.8"/><ellipse cx="200" cy="60" rx="12" ry="5" fill="#eaf2ff" opacity="0.85"/><!-- swirl of light inside --><path d="M188,150 Q198,130 195,115 Q192,100 205,95" stroke="#ffffff" stroke-width="2" fill="none" opacity="0.6" filter="url(#gg3)"/><!-- star motes drifting up and out --><g fill="#eaf2ff" filter="url(#gg2)"><circle cx="150" cy="70" r="2.4" opacity="0.8"/><circle cx="255" cy="60" r="2" opacity="0.7"/><circle cx="130" cy="110" r="1.6" opacity="0.6"/><circle cx="270" cy="105" r="1.8" opacity="0.6"/><circle cx="165" cy="45" r="1.4" opacity="0.55"/><circle cx="235" cy="40" r="1.5" opacity="0.55"/><circle cx="200" cy="35" r="1.8" opacity="0.65"/></g></svg>'
+    },
+    {
+      seedId: 'seed-secrets-of-the-lake-v1',
+      name: 'Secrets of the Lake',
+      text: 'When you set this scheme in motion, put Monstrosity of the Lake onto the battlefield under your control.',
+      type: 'oneshot', qty: 1, art: null
+    },
+    {
+      seedId: 'seed-bridge-of-khazad-dum-v1',
+      name: 'The Bridge of Khazad-d\u00fbm',
+      text: 'When you set this scheme in motion, each player chooses up to one creature they control, then sacrifices the rest.',
+      type: 'oneshot', qty: 1, art: null
+    },
+    {
+      seedId: 'seed-fires-of-mount-doom-v1',
+      name: 'Fires of Mount Doom',
+      text: 'When you set this scheme in motion, destroy up to two target artifacts.',
+      type: 'oneshot', qty: 1, art: null
+    },
+    {
+      seedId: 'seed-council-of-elrond-v1',
+      name: 'The Council of Elrond',
+      text: 'When you set this scheme in motion, the Ring tempts each player, starting with the player to your left. Then you may have target legendary creature you control fight up to one target legendary creature you don\'t control.',
+      type: 'oneshot', qty: 1, art: null
     }
   ];
 
@@ -456,19 +471,25 @@
       for (var i = 0; i < library.cards.length; i++){ if (library.cards[i].seedId === seed.seedId){ existing = library.cards[i]; break; } }
       if (existing){
         if (!existing.seedLocked){
-          var newArt = seed.art || null, newSpecial = seed.special || null, newFirst = !!seed.firstTurnOnly;
-          if (existing.name !== seed.name || existing.text !== seed.text || existing.type !== seed.type || existing.qty !== seed.qty || existing.art !== newArt || existing.firstTurnOnly !== newFirst || existing.special !== newSpecial){
+          var newArt = seed.art || null, newSpecial = seed.special || null, newFirst = !!seed.firstTurnOnly, newMinTurn = seed.minTurn || null;
+          if (existing.name !== seed.name || existing.text !== seed.text || existing.type !== seed.type || existing.qty !== seed.qty || existing.art !== newArt || existing.firstTurnOnly !== newFirst || existing.special !== newSpecial || existing.minTurn !== newMinTurn){
             existing.name = seed.name; existing.text = seed.text; existing.type = seed.type; existing.qty = seed.qty;
-            existing.art = newArt; existing.firstTurnOnly = newFirst; existing.special = newSpecial;
+            existing.art = newArt; existing.firstTurnOnly = newFirst; existing.special = newSpecial; existing.minTurn = newMinTurn;
             seededChanged = true;
           }
         }
       } else if (library.seededIds.indexOf(seed.seedId) === -1){
-        library.cards.push({ id: uid(), seedId: seed.seedId, name: seed.name, text: seed.text, type: seed.type, qty: seed.qty, art: seed.art || null, firstTurnOnly: !!seed.firstTurnOnly, special: seed.special || null, seedLocked: false });
+        library.cards.push({ id: uid(), seedId: seed.seedId, name: seed.name, text: seed.text, type: seed.type, qty: seed.qty, art: seed.art || null, firstTurnOnly: !!seed.firstTurnOnly, special: seed.special || null, minTurn: seed.minTurn || null, seedLocked: false });
         library.seededIds.push(seed.seedId);
         seededChanged = true;
       }
     });
+
+    if (REMOVED_SEED_IDS.length > 0){
+      var beforeRemoveCount = library.cards.length;
+      library.cards = library.cards.filter(function(c){ return REMOVED_SEED_IDS.indexOf(c.seedId) === -1; });
+      if (library.cards.length !== beforeRemoveCount) seededChanged = true;
+    }
     if (seededChanged) saveLibrary();
 
     var starterMigrated = false;
@@ -546,15 +567,31 @@
     return (game.turn === 1 && game.starterDeck.length > 0) ? game.starterDeck : game.deck;
   }
 
+  function findCardById(cardId){
+    for (var i = 0; i < library.cards.length; i++){ if (library.cards[i].id === cardId) return library.cards[i]; }
+    return null;
+  }
+
+  function findEligibleIndex(pool){
+    for (var i = 0; i < pool.length; i++){
+      var card = findCardById(pool[i].cardId);
+      if (!card) continue;
+      if (card.minTurn && game.turn < card.minTurn) continue;
+      return i;
+    }
+    return -1;
+  }
+
   function nextTurn(){ game.turn += 1; game.drawnThisTurn = false; saveGame(); render(); }
   function prevTurn(){ if (game.turn > 0){ game.turn -= 1; game.drawnThisTurn = false; saveGame(); render(); } }
 
   function drawScheme(){
     var pool = activeDrawPool();
-    if (game.drawnThisTurn || !isEligible() || pool.length === 0) return;
-    var drawn = pool.shift();
-    var card = null;
-    for (var i = 0; i < library.cards.length; i++){ if (library.cards[i].id === drawn.cardId){ card = library.cards[i]; break; } }
+    if (game.drawnThisTurn || !isEligible()) return;
+    var idx = findEligibleIndex(pool);
+    if (idx === -1) return;
+    var drawn = pool.splice(idx, 1)[0];
+    var card = findCardById(drawn.cardId);
     if (!card){ saveGame(); render(); return; }
     game.drawnThisTurn = true;
     game.lastDrawn = { instanceId: drawn.id, cardId: card.id, name: card.name, text: card.text, type: card.type, art: card.art || null, special: card.special || null };
@@ -594,9 +631,9 @@
       var found = null;
       for (var i = 0; i < library.cards.length; i++){ if (library.cards[i].id === id){ found = library.cards[i]; break; } }
       if (!found) return;
-      cardForm = { id: found.id, name: found.name, text: found.text, type: found.type, qty: found.qty, art: found.art || null, firstTurnOnly: !!found.firstTurnOnly };
+      cardForm = { id: found.id, name: found.name, text: found.text, type: found.type, qty: found.qty, art: found.art || null, firstTurnOnly: !!found.firstTurnOnly, minTurn: found.minTurn || null };
     } else {
-      cardForm = { id: null, name: '', text: '', type: 'oneshot', qty: 1, art: null, firstTurnOnly: false };
+      cardForm = { id: null, name: '', text: '', type: 'oneshot', qty: 1, art: null, firstTurnOnly: false, minTurn: null };
     }
     pendingDeleteId = null;
     render();
@@ -608,9 +645,11 @@
     var n = document.getElementById('cf-name');
     var t = document.getElementById('cf-text');
     var q = document.getElementById('cf-qty');
+    var mt = document.getElementById('cf-minturn');
     if (n) cardForm.name = n.value;
     if (t) cardForm.text = t.value;
     if (q) cardForm.qty = Math.max(1, parseInt(q.value, 10) || 1);
+    if (mt) cardForm.minTurn = mt.value.trim() === '' ? null : Math.max(1, parseInt(mt.value, 10) || 1);
   }
   function setFormType(type){ syncFormFromDOM(); cardForm.type = type; render(); }
   function toggleFirstTurnOnly(){ syncFormFromDOM(); cardForm.firstTurnOnly = !cardForm.firstTurnOnly; render(); }
@@ -628,12 +667,13 @@
           library.cards[i].qty = cardForm.qty;
           library.cards[i].art = cardForm.art || null;
           library.cards[i].firstTurnOnly = !!cardForm.firstTurnOnly;
+          library.cards[i].minTurn = cardForm.minTurn || null;
           library.cards[i].seedLocked = true;
           break;
         }
       }
     } else {
-      library.cards.push({ id: uid(), name: name, text: cardForm.text || '', type: cardForm.type, qty: cardForm.qty, art: cardForm.art || null, firstTurnOnly: !!cardForm.firstTurnOnly });
+      library.cards.push({ id: uid(), name: name, text: cardForm.text || '', type: cardForm.type, qty: cardForm.qty, art: cardForm.art || null, firstTurnOnly: !!cardForm.firstTurnOnly, minTurn: cardForm.minTurn || null });
     }
     saveLibrary();
     cardForm = null;
@@ -666,6 +706,7 @@
     return library.cards.map(function(c){
       var lines = ['Name: ' + c.name, 'Type: ' + (c.type === 'ongoing' ? 'ongoing' : 'oneshot'), 'Qty: ' + (c.qty || 1)];
       if (c.firstTurnOnly) lines.push('First turn only: yes');
+      if (c.minTurn) lines.push('Min turn: ' + c.minTurn);
       lines.push('Text: ' + (c.text || ''));
       return lines.join('\n');
     }).join('\n---\n');
@@ -680,7 +721,7 @@
     });
     var cards = [];
     blocks.forEach(function(blockLines){
-      var name = '', type = 'oneshot', qty = 1, firstTurnOnly = false, textLines = null;
+      var name = '', type = 'oneshot', qty = 1, firstTurnOnly = false, minTurn = null, textLines = null;
       for (var i = 0; i < blockLines.length; i++){
         var line = blockLines[i];
         if (textLines !== null){ textLines.push(line); continue; }
@@ -688,16 +729,18 @@
         var mType = /^\s*Type\s*:\s*(.*)$/i.exec(line);
         var mQty = /^\s*Qty\s*:\s*(.*)$/i.exec(line);
         var mFirst = /^\s*First turn only\s*:\s*(.*)$/i.exec(line);
+        var mMinTurn = /^\s*Min turn\s*:\s*(.*)$/i.exec(line);
         var mText = /^\s*Text\s*:\s*(.*)$/i.exec(line);
         if (mName){ name = mName[1].trim(); }
         else if (mType){ type = /ongoing/i.test(mType[1]) ? 'ongoing' : 'oneshot'; }
         else if (mQty){ qty = Math.max(1, parseInt(mQty[1], 10) || 1); }
         else if (mFirst){ firstTurnOnly = /^(yes|true|1)$/i.test(mFirst[1].trim()); }
+        else if (mMinTurn){ var mt = parseInt(mMinTurn[1], 10); minTurn = mt > 1 ? mt : null; }
         else if (mText){ textLines = [mText[1]]; }
       }
       var cardText = textLines ? textLines.join('\n').trim() : '';
       name = name.trim();
-      if (name){ cards.push({ name: name, type: type, qty: qty, firstTurnOnly: firstTurnOnly, text: cardText }); }
+      if (name){ cards.push({ name: name, type: type, qty: qty, firstTurnOnly: firstTurnOnly, minTurn: minTurn, text: cardText }); }
     });
     return cards;
   }
@@ -714,12 +757,13 @@
     library.cards.forEach(function(c){ existingByName[(c.name || '').trim().toLowerCase()] = c; });
     library.cards = parsed.map(function(p){
       var match = existingByName[p.name.toLowerCase()];
-      return { id: match ? match.id : uid(), name: p.name, type: p.type, qty: p.qty, firstTurnOnly: !!p.firstTurnOnly, text: p.text, art: match ? (match.art || null) : null, special: match ? (match.special || null) : null, seedId: match ? (match.seedId || null) : null, seedLocked: !!match };
+      return { id: match ? match.id : uid(), name: p.name, type: p.type, qty: p.qty, firstTurnOnly: !!p.firstTurnOnly, minTurn: p.minTurn || null, text: p.text, art: match ? (match.art || null) : null, special: match ? (match.special || null) : null, seedId: match ? (match.seedId || null) : null, seedLocked: !!match };
     });
     var ids = {};
     library.cards.forEach(function(c){ ids[c.id] = true; });
     game.deck = game.deck.filter(function(i){ return ids[i.cardId]; });
     game.ongoing = game.ongoing.filter(function(i){ return ids[i.cardId]; });
+    game.starterDeck = game.starterDeck.filter(function(i){ return ids[i.cardId]; });
     saveLibrary(); saveGame();
     bulkMode = false;
     render();
@@ -905,12 +949,14 @@
       html += '<div class="empty-note">No schemes yet. Add some in the Cards tab.</div>';
     } else {
       var pool = activeDrawPool();
-      var disabled = !eligible || game.drawnThisTurn || pool.length === 0;
+      var eligibleIdx = findEligibleIndex(pool);
+      var disabled = !eligible || game.drawnThisTurn || eligibleIdx === -1;
       html += '<button class="draw-btn" ' + (disabled ? 'disabled' : '') + ' onclick="App.drawScheme()">Draw a Scheme</button>';
       var hint = '';
       if (!eligible) hint = 'Not eligible this turn.';
       else if (game.drawnThisTurn) hint = 'Resolve the scheme above to continue.';
       else if (pool.length === 0) hint = 'No schemes left. Abandon an ongoing scheme, or reshuffle in Rules.';
+      else if (eligibleIdx === -1) hint = 'No eligible schemes yet — something in the deck unlocks later.';
       if (hint) html += '<div class="draw-hint">' + hint + '</div>';
 
       if (game.lastDrawn){
@@ -988,6 +1034,8 @@
       html += '<label>Copies in deck</label><input type="number" id="cf-qty" min="1" max="10" value="' + (f.qty || 1) + '">';
       html += '<label>Special timing</label><div class="type-toggle"><button class="' + (f.firstTurnOnly ? 'active' : '') + '" onclick="App.toggleFirstTurnOnly()">First turn only</button></div>';
       html += '<div class="hint">If on, this scheme is guaranteed to be the first one drawn each game, then set aside for the rest of that game instead of returning to the deck.</div>';
+      html += '<label>Minimum turn (optional)</label><input type="number" id="cf-minturn" min="1" placeholder="e.g. 3" value="' + (f.minTurn || '') + '">';
+      html += '<div class="hint">Leave blank for no restriction. If set, this scheme stays in the deck but can\'t be drawn before that turn.</div>';
       html += '<div class="form-actions">';
       html += '<button class="btn btn-primary" onclick="App.saveCardForm()">Save</button>';
       if (f.id){ html += '<button class="btn btn-danger" onclick="App.deleteCardConfirm(\'' + f.id + '\')">' + (pendingDeleteId === f.id ? 'Confirm delete?' : 'Delete') + '</button>'; }
@@ -1001,7 +1049,7 @@
       library.cards.forEach(function(c){
         html += '<div class="card-row" onclick="App.openCardForm(\'' + c.id + '\')">';
         html += renderArtBox(c.art, 'thumb');
-        html += '<div class="card-row-main"><div class="card-row-badges"><span class="badge ' + c.type + '">' + (c.type === 'ongoing' ? 'Ongoing' : 'Scheme') + '</span>' + (c.firstTurnOnly ? '<span class="badge first-turn">Turn 1</span>' : '') + (c.special ? '<span class="badge special">★ Special</span>' : '') + '</div><span class="card-row-name">' + esc(c.name) + '</span></div>';
+        html += '<div class="card-row-main"><div class="card-row-badges"><span class="badge ' + c.type + '">' + (c.type === 'ongoing' ? 'Ongoing' : 'Scheme') + '</span>' + (c.firstTurnOnly ? '<span class="badge first-turn">Turn 1</span>' : '') + (c.minTurn ? '<span class="badge first-turn">Turn ' + c.minTurn + '+</span>' : '') + (c.special ? '<span class="badge special">★ Special</span>' : '') + '</div><span class="card-row-name">' + esc(c.name) + '</span></div>';
         html += '<div class="card-row-qty">×' + (c.qty || 1) + '</div>';
         html += '</div>';
       });
