@@ -58,6 +58,7 @@
 
   .btn{padding:10px 16px;border-radius:9px;border:1px solid var(--panel-border);background:rgba(255,255,255,0.03);color:var(--text-light);font-size:14px;}
   .btn-primary{background:linear-gradient(180deg,var(--brass-bright),var(--brass));color:var(--ink-deep);border:none;font-weight:600;box-shadow:inset 0 1px 0 rgba(255,255,255,0.3),inset 0 -2px 3px rgba(0,0,0,0.2);}
+  .btn-primary:disabled{background:#2c2e29;color:var(--muted);box-shadow:none;opacity:0.7;}
   .btn-ghost{background:none;border:1px solid var(--panel-border);color:var(--text-light);}
   .btn-danger{background:none;border:1px solid var(--ember);color:#e0a08f;}
   .btn-block{display:block;width:100%;}
@@ -67,10 +68,20 @@
   .start-title{font-family:var(--font-display);font-size:21px;color:var(--parchment-hi);margin:16px 0 6px;}
   .start-sub{font-size:13px;color:var(--muted);margin-bottom:26px;}
   .commander-label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px;text-align:left;}
-  .commander-select{width:100%;padding:11px 12px;border-radius:9px;border:1px solid var(--panel-border);background:rgba(0,0,0,0.25);color:var(--text-light);font-size:14px;margin-bottom:14px;-webkit-appearance:none;appearance:none;}
-  .review-toggle-row{margin-bottom:8px;}
-  .review-toggle-row button{width:100%;padding:10px;border-radius:9px;border:1px solid var(--panel-border);background:none;color:var(--muted);font-size:13px;}
-  .review-toggle-row button.active{background:rgba(216,174,102,0.15);color:var(--brass-bright);border-color:var(--brass);}
+  .commander-picker-btn{width:100%;text-align:left;padding:11px 12px;border-radius:9px;border:1px solid var(--panel-border);background:rgba(0,0,0,0.25);color:var(--text-light);font-size:14px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;gap:8px;}
+  .picker-chevron{color:var(--muted);font-size:10px;flex-shrink:0;}
+  .commander-picker-list{background:rgba(0,0,0,0.35);border:1px solid var(--panel-border);border-radius:9px;margin-bottom:14px;overflow:hidden;}
+  .commander-picker-option{display:block;width:100%;text-align:left;padding:11px 12px;background:none;border:none;border-bottom:1px solid rgba(255,255,255,0.06);color:var(--text-light);font-size:14px;}
+  .commander-picker-option:last-child{border-bottom:none;}
+  .commander-picker-option.active{color:var(--brass-bright);background:rgba(216,174,102,0.12);}
+  .switch-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:2px 0 8px;}
+  .switch-row-label{font-size:13px;color:var(--text-light);flex:1;}
+  .switch{position:relative;display:inline-block;width:44px;height:26px;flex-shrink:0;}
+  .switch input{position:absolute;opacity:0;width:100%;height:100%;margin:0;cursor:pointer;}
+  .switch-track{position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,0.12);border:1px solid var(--panel-border);border-radius:20px;transition:background .15s,border-color .15s;pointer-events:none;}
+  .switch-track::before{content:'';position:absolute;height:18px;width:18px;left:3px;top:3px;background:var(--muted);border-radius:50%;transition:transform .15s,background .15s;}
+  .switch input:checked ~ .switch-track{background:rgba(216,174,102,0.35);border-color:var(--brass);}
+  .switch input:checked ~ .switch-track::before{transform:translateX(18px);background:var(--brass-bright);}
   .rating-prompt{text-align:center;margin:8px 0 22px;}
   .rating-label{font-size:13px;color:var(--muted);margin-bottom:10px;}
   .rating-rings{display:flex;justify-content:center;gap:10px;}
@@ -202,6 +213,7 @@
   var storageError = false;
   var reviewModeChecked = false;
   var selectedCommander = '';
+  var commanderPickerOpen = false;
   var COMMANDER_LIST = [
     "Thorin, King of Durin's Folk",
     "The Great Goblin",
@@ -712,6 +724,7 @@
     bulkMode = false;
     showGameMenu = false;
     pendingClearRatings = false;
+    commanderPickerOpen = false;
     render();
   }
 
@@ -878,7 +891,8 @@
     saveGame();
     render();
   }
-  function onCommanderChange(sel){ selectedCommander = sel.value; render(); }
+  function toggleCommanderPicker(){ commanderPickerOpen = !commanderPickerOpen; render(); }
+  function selectCommanderByIndex(idx){ selectedCommander = COMMANDER_LIST[idx] || ''; commanderPickerOpen = false; render(); }
   function toggleReviewModeChecked(){ reviewModeChecked = !reviewModeChecked; render(); }
 
   function confirmNewGame(){
@@ -926,27 +940,35 @@
     }
   }
 
-  function birdMarkup(){
-    return '<defs><linearGradient id="birdBodyGrad" x1="0" y1="0" x2="1" y2="1">' +
-      '<stop offset="0%" stop-color="#D8AE66"/><stop offset="100%" stop-color="#A9803E"/></linearGradient></defs>' +
-      '<polygon points="44,58 22,48 4,32 8,46 18,58 34,66 45,66" fill="#7a5f30" stroke="#4a3818" stroke-width="1"/>' +
-      '<polygon points="43,64 24,60 10,54 16,64 28,71 42,70" fill="#93753d" stroke="#4a3818" stroke-width="1"/>' +
-      '<line x1="30" y1="52" x2="10" y2="38" stroke="#4a3818" stroke-width="1" opacity="0.55"/>' +
-      '<line x1="28" y1="61" x2="14" y2="53" stroke="#4a3818" stroke-width="1" opacity="0.5"/>' +
-      '<polygon points="68,26 82,27 93,35 99,48 97,61 88,73 73,80 57,79 46,72 40,60 41,47 48,35 58,28" fill="url(#birdBodyGrad)" stroke="#4a3818" stroke-width="1.2"/>' +
-      '<polygon points="58,28 68,26 63,42" fill="#e8c583" opacity="0.55"/>' +
-      '<polygon points="48,35 41,47 56,46" fill="#e8c583" opacity="0.35"/>' +
-      '<polygon points="46,72 57,79 60,58" fill="#e8c583" opacity="0.4"/>' +
-      '<polygon points="88,73 73,80 76,58" fill="#7a5a28" opacity="0.45"/>' +
-      '<polygon points="93,35 99,48 82,44" fill="#7a5a28" opacity="0.35"/>' +
-      '<polygon points="40,60 41,47 50,55" fill="#7a5a28" opacity="0.35"/>' +
-      '<polygon points="94,40 106,44 93,50" fill="#3d2f1a" stroke="#241a0d" stroke-width="0.6"/>' +
-      '<circle cx="81" cy="36" r="2.3" fill="#1a1610"/>' +
-      '<circle cx="80" cy="35" r="0.7" fill="#D8AE66" opacity="0.7"/>';
+  function logoMarkup(){
+    return '<defs>' +
+      '<linearGradient id="ringGold" x1="20%" y1="10%" x2="80%" y2="90%"><stop offset="0%" stop-color="#D8AE66"/><stop offset="45%" stop-color="#A9803E"/><stop offset="100%" stop-color="#D8AE66"/></linearGradient>' +
+      '<linearGradient id="flameEmber" x1="50%" y1="0%" x2="50%" y2="100%"><stop offset="0%" stop-color="#D8AE66"/><stop offset="38%" stop-color="#9C4630"/><stop offset="100%" stop-color="#6F2F25"/></linearGradient>' +
+      '</defs>' +
+      '<g fill="url(#flameEmber)">' +
+      '<path d="M50 40 C43 35 42 28 47 22 C46 17 49 12 54 7 C53 16 61 21 59 29 C58 35 54 38 50 40 Z"/>' +
+      '<path d="M39 43 C32 40 27 34 29 27 C23 32 21 39 25 45 C27 49 32 51 38 51 Z"/>' +
+      '<path d="M61 43 C68 39 73 33 71 26 C78 31 80 39 76 46 C74 50 68 52 62 51 Z"/>' +
+      '<path d="M37 57 C29 52 21 53 15 59 C21 59 24 64 22 70 C29 68 35 65 39 61 Z"/>' +
+      '<path d="M63 57 C71 52 79 53 85 59 C79 59 76 64 78 70 C71 68 65 65 61 61 Z"/>' +
+      '<path d="M43 68 C37 70 34 76 36 83 C40 78 44 78 47 76 Z"/>' +
+      '<path d="M57 68 C63 70 66 76 64 83 C60 78 56 78 53 76 Z"/>' +
+      '</g>' +
+      '<g fill="#D8AE66">' +
+      '<path d="M50 34 C47 30 48 25 52 21 C52 27 56 29 54 33 C53 35 51 36 50 34 Z"/>' +
+      '<path d="M27 47 C25 43 27 39 31 36 C30 42 34 44 32 48 C31 50 29 50 27 47 Z"/>' +
+      '<path d="M73 47 C75 43 73 39 69 36 C70 42 66 44 68 48 C69 50 71 50 73 47 Z"/>' +
+      '</g>' +
+      '<circle cx="50" cy="53" r="25" fill="none" stroke="#6F2F25" stroke-width="12"/>' +
+      '<circle cx="50" cy="53" r="25" fill="none" stroke="url(#ringGold)" stroke-width="9"/>' +
+      '<circle cx="50" cy="53" r="20.5" fill="none" stroke="#D8AE66" stroke-width="2" opacity="0.9"/>';
   }
-  function birdSVG(size){
-    var h = Math.round(size * 100 / 115);
-    return '<svg viewBox="0 0 115 100" width="' + size + '" height="' + h + '" xmlns="http://www.w3.org/2000/svg">' + birdMarkup() + '</svg>';
+  function logoSVG(size){
+    return '<svg viewBox="0 0 100 100" width="' + size + '" height="' + size + '" xmlns="http://www.w3.org/2000/svg">' + logoMarkup() + '</svg>';
+  }
+  function renderSwitch(checked, onclickAttr, label){
+    return '<label class="switch-row"><span class="switch-row-label">' + esc(label) + '</span>' +
+      '<span class="switch"><input type="checkbox" ' + (checked ? 'checked ' : '') + 'onclick="' + onclickAttr + '"><span class="switch-track"></span></span></label>';
   }
   function ringIcon(size){
     return '<svg viewBox="0 0 40 40" width="' + size + '" height="' + size + '" xmlns="http://www.w3.org/2000/svg"><circle cx="20" cy="20" r="14" fill="none" stroke="currentColor" stroke-width="5"/></svg>';
@@ -969,7 +991,7 @@
       '<g opacity="0.4" stroke="#A9803E" stroke-width="1">' +
       '<line x1="0" y1="50" x2="400" y2="50"/><line x1="0" y1="100" x2="400" y2="100"/><line x1="0" y1="150" x2="400" y2="150"/>' +
       '</g>' +
-      '<g transform="translate(140,50) scale(0.9)" opacity="0.5">' + birdMarkup() + '</g>' +
+      '<g transform="translate(150,30) scale(1.0)" opacity="0.5">' + logoMarkup() + '</g>' +
       '</svg>';
   }
   function renderArtBox(art, context){
@@ -1015,7 +1037,7 @@
     var gearBtn = (game && game.started) ? '<button class="gear-btn" onclick="App.toggleGameMenu()" aria-label="Game menu">⚙</button>' : '';
     var subtitle = (game && game.started && game.commander) ? 'Archenemy: ' + esc(game.commander) : 'a scheme-keeper for Middle-earth game night';
     var html = '<div class="topbar">' +
-      '<div class="topbar-left"><div class="seal-mini">' + birdSVG(38) + '</div>' +
+      '<div class="topbar-left"><div class="seal-mini">' + logoSVG(38) + '</div>' +
       '<div><div class="app-title">Arbeider Archenemy</div><div class="app-subtitle">' + subtitle + '</div></div></div>' +
       gearBtn +
       '</div>';
@@ -1035,20 +1057,22 @@
 
   function renderStartScreen(){
     var html = '<div class="start-screen">';
-    html += birdSVG(64);
+    html += logoSVG(64);
     html += '<div class="start-title">Ready when you are</div>';
     html += '<div class="start-sub">' + library.cards.length + ' scheme' + (library.cards.length === 1 ? '' : 's') + ' in your deck</div>';
     if (library.cards.length === 0){
       html += '<div class="empty-note">Add some schemes in the Cards tab first.</div>';
     } else {
       html += '<label class="commander-label">Archenemy\'s commander</label>';
-      html += '<select class="commander-select" onchange="App.onCommanderChange(this)">';
-      html += '<option value="" disabled' + (selectedCommander === '' ? ' selected' : '') + '>Choose a commander…</option>';
-      COMMANDER_LIST.forEach(function(name){
-        html += '<option value="' + esc(name) + '"' + (selectedCommander === name ? ' selected' : '') + '>' + esc(name) + '</option>';
-      });
-      html += '</select>';
-      html += '<div class="review-toggle-row"><button class="' + (reviewModeChecked ? 'active' : '') + '" onclick="App.toggleReviewModeChecked()">Rate scheme power this game</button></div>';
+      html += '<button class="commander-picker-btn" onclick="App.toggleCommanderPicker()"><span>' + (selectedCommander ? esc(selectedCommander) : 'Choose a commander…') + '</span><span class="picker-chevron">' + (commanderPickerOpen ? '▲' : '▼') + '</span></button>';
+      if (commanderPickerOpen){
+        html += '<div class="commander-picker-list">';
+        COMMANDER_LIST.forEach(function(name, idx){
+          html += '<button class="commander-picker-option' + (selectedCommander === name ? ' active' : '') + '" onclick="App.selectCommanderByIndex(' + idx + ')">' + esc(name) + '</button>';
+        });
+        html += '</div>';
+      }
+      html += renderSwitch(reviewModeChecked, 'App.toggleReviewModeChecked()', 'Rate scheme power this game');
       html += '<div class="hint">If on, after resolving each scheme you\'ll rate how strong it felt. Ratings are saved so you can review and rebalance later, in the Rules tab.</div>';
       html += '<button class="btn btn-primary btn-block" ' + (selectedCommander ? '' : 'disabled') + ' onclick="App.startGame()">Start New Game</button>';
       if (!selectedCommander) html += '<div class="hint">Choose a commander to continue.</div>';
@@ -1157,7 +1181,7 @@
       html += '<button class="' + (f.type === 'ongoing' ? 'active' : '') + '" onclick="App.setFormType(\'ongoing\')">Ongoing</button>';
       html += '</div>';
       html += '<label>Copies in deck</label><input type="number" id="cf-qty" min="1" max="10" value="' + (f.qty || 1) + '">';
-      html += '<label>Special timing</label><div class="type-toggle"><button class="' + (f.firstTurnOnly ? 'active' : '') + '" onclick="App.toggleFirstTurnOnly()">First turn only</button></div>';
+      html += '<label>Special timing</label>' + renderSwitch(f.firstTurnOnly, 'App.toggleFirstTurnOnly()', 'First turn only');
       html += '<div class="hint">If on, this scheme is guaranteed to be the first one drawn each game, then set aside for the rest of that game instead of returning to the deck.</div>';
       html += '<label>Minimum turn (optional)</label><input type="number" id="cf-minturn" min="1" placeholder="e.g. 3" value="' + (f.minTurn || '') + '">';
       html += '<div class="hint">Leave blank for no restriction. If set, this scheme stays in the deck but can\'t be drawn before that turn.</div>';
@@ -1260,7 +1284,7 @@
 
     html += '<div class="rules-section">';
     html += '<div class="section-label">Sound</div>';
-    html += '<div class="type-toggle"><button class="' + (library.soundEffects !== false ? 'active' : '') + '" onclick="App.toggleSound()">Sound effects</button></div>';
+    html += renderSwitch(library.soundEffects !== false, 'App.toggleSound()', 'Sound effects');
     html += '<div class="hint">A short chime plays when you draw a scheme.</div>';
     html += '</div>';
 
@@ -1301,7 +1325,7 @@
     copyBackup: copyBackup, doImport: doImport, onArtFileSelected: onArtFileSelected, removeArt: removeArt,
     toggleBulk: toggleBulk, saveBulkCards: saveBulkCards, startGame: startGame,
     toggleFirstTurnOnly: toggleFirstTurnOnly,
-    onCommanderChange: onCommanderChange, toggleSound: toggleSound,
+    toggleCommanderPicker: toggleCommanderPicker, selectCommanderByIndex: selectCommanderByIndex, toggleSound: toggleSound,
     toggleReviewModeChecked: toggleReviewModeChecked, rateLastDrawn: rateLastDrawn, confirmClearRatings: confirmClearRatings,
     toggleGameMenu: toggleGameMenu, goToMainMenu: goToMainMenu
   };
